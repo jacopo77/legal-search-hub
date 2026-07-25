@@ -4,10 +4,12 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { env } from "@/lib/env";
 
 // Sitemap (T22): static pages + every live city + every live firm. Uses the
-// service-role client (not the cookie client) so this handler stays
-// cacheable — reading cookies would force it dynamic on every request.
+// service-role client (not the cookie client) so requests don't depend on
+// cookies. Fully dynamic: never prerendered at build time (keeps external
+// I/O out of the build entirely — the Supabase query runs per request,
+// and sitemaps are fetched rarely enough that caching doesn't matter).
 // Only public data (live rows) is selected.
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 type SitemapFirmRow = {
   slug: string;
