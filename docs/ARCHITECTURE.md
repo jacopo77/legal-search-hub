@@ -264,9 +264,12 @@ best-effort with retry, not transactional with the DB write).
 - `POST /api/webhooks/stripe` handles:
   - `checkout.session.completed` → set `firms.tier = "premium"`, store
     `stripe_subscription_id`, fire the HighLevel opportunity trigger (§5).
-  - `customer.subscription.deleted` / payment failure → set `firms.tier =
-    "free"` (or `suspended` per business rule to be defined at
-    implementation time).
+  - `customer.subscription.deleted` → set `firms.tier = "free"` and clear
+    `stripe_subscription_id`.
+  - `invoice.payment_failed` → log only (business rule decided at T19):
+    Stripe dunning retries the card, and only the final failure deletes the
+    subscription — which reverts the tier via the event above. Reverting on
+    the first failed charge would flip paying firms to free mid-retry.
 - `profiles.stripe_customer_id` is set on first Checkout session so repeat
   billing actions don't need to re-resolve identity.
 
