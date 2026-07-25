@@ -5,6 +5,7 @@ import { Globe, Phone, MapPin, BadgeCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { GoogleRatingBadge } from "@/components/listings/google-rating-badge";
 import { ClaimRequestForm } from "@/components/firms/claim-request-form";
+import { LeadForm } from "@/components/firms/lead-form";
 import { Button, buttonVariants } from "@/components/ui/button";
 
 // Full firm profile (ARCHITECTURE.md §4.4). Public readers only ever see
@@ -316,7 +317,16 @@ export async function FirmDetail({
             </>
           )}
 
-          {/* T21: premium "Contact this firm" lead form goes here */}
+          {/* "Contact this firm" lead form (T21): premium only — delivery
+              runs through HighLevel, not a direct email. */}
+          {isPremium && (
+            <>
+              <h3 className="mt-5 text-sm font-semibold">
+                Contact this firm
+              </h3>
+              <LeadForm firmId={firm.id} firmName={firm.name} />
+            </>
+          )}
         </aside>
       </div>
     </article>
