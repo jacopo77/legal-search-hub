@@ -30,6 +30,8 @@ land.
 
 - [ ] Dashboard → Authentication → URL Configuration: Site URL = the domain
 - [ ] Add `https://<domain>/auth/callback` to allowed redirect URLs
+- [ ] Apply any pending migrations to the production project — currently
+      `db/migrations/0004_public_insert_predicates.sql` (RLS tightening)
 
 ## 3. Stripe live mode
 
