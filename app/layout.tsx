@@ -1,20 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SiteNav } from "@/components/nav/site-nav";
 import { SiteFooter } from "@/components/nav/site-footer";
 import { env } from "@/lib/env";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+// NOTE: no next/font/google — it downloads fonts from Google at build time,
+// which crashed Vercel's page-data workers silently. System font stack via
+// globals.css instead (zero build-time network I/O).
 
 // Site-wide defaults (T22). Pages override title/description; the template
 // appends the brand. metadataBase makes og/canonical URLs absolute.
@@ -38,10 +31,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
+    <html lang="en" className="h-full antialiased">
       <body className="flex min-h-full flex-col">
         <SiteNav />
         <main className="flex-1">{children}</main>
