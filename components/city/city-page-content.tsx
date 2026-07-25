@@ -13,7 +13,9 @@ async function getCity(slug: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("cities")
-    .select("id, slug, name, state, status, hero_image_url")
+    .select(
+      "id, slug, name, state, status, hero_image_url, hero_headline, hero_subtext",
+    )
     .eq("slug", slug)
     .maybeSingle();
   if (error) {
@@ -49,6 +51,8 @@ export async function CityPageContent({
           name: city.name,
           state: city.state,
           heroImageUrl: city.hero_image_url,
+          heroHeadline: city.hero_headline,
+          heroSubtext: city.hero_subtext,
         }}
       />
       <div className="mx-auto max-w-6xl space-y-12 px-4 py-12">

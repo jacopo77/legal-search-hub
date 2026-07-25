@@ -12,11 +12,11 @@ export function FreeListingCard({
   citySlug: string;
 }) {
   return (
-    <li className="rounded-xl border border-border bg-card p-5">
+    <li className="rounded-xl border border-border bg-muted/30 p-5">
       <h3 className="font-semibold">
         <Link
           href={`/${citySlug}/firms/${firm.slug}`}
-          className="hover:text-primary hover:underline"
+          className="hover:text-navy hover:underline"
         >
           {firm.name}
         </Link>
@@ -47,7 +47,7 @@ export function FreeListingCard({
       {firm.phone && (
         <a
           href={`tel:${firm.phone.replace(/[^0-9+]/g, "")}`}
-          className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+          className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-navy hover:underline"
         >
           <Phone className="size-4" aria-hidden />
           {firm.phone}

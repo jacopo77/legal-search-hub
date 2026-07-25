@@ -2,14 +2,16 @@ import { Search } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 
 // The one Hero component for every city (CLAUDE.md rule 1): all copy is
-// parameterized by the city row — nothing Phoenix-specific may be written
-// here. Rendered by CityPageContent (T8) for both /[city] and / in
-// HOMEPAGE_MODE=phoenix (T9).
+// parameterized by the city row (hero_headline/hero_subtext, with generic
+// fallbacks) — nothing Phoenix-specific may be written here. Rendered by
+// CityPageContent (T8) for both /[city] and / in HOMEPAGE_MODE=phoenix (T9).
 export type HeroCity = {
   slug: string;
   name: string;
   state: string;
   heroImageUrl: string | null;
+  heroHeadline: string | null;
+  heroSubtext: string | null;
 };
 
 async function getPracticeAreas() {
@@ -28,29 +30,36 @@ async function getPracticeAreas() {
 export async function Hero({ city }: { city: HeroCity }) {
   const practiceAreas = await getPracticeAreas();
 
+  const headline = city.heroHeadline ?? `Find the right attorney in ${city.name}`;
+  const subtext =
+    city.heroSubtext ??
+    `Compare ${city.name}, ${city.state} law firms by practice area and Google rating — free to search, no signup needed.`;
+
   return (
-    <section className="relative overflow-hidden">
-      {/* Full-bleed hero image from cities.hero_image_url (Supabase Storage,
-          city-hero-images bucket). Decorative — content stays readable via
-          the overlay, and a brand gradient covers the no-image case. */}
+    <section className="relative flex min-h-[calc(100svh-4rem)] items-center overflow-hidden">
+      {/* Full-bleed hero image from cities.hero_image_url (local public/
+          asset for Phoenix; other cities via their row). Decorative —
+          content stays readable via the fixed 0.35 black overlay. */}
       <div
         aria-hidden
-        className="absolute inset-0 bg-gradient-to-br from-primary/90 via-primary/70 to-primary/40 bg-cover bg-center"
+        className="absolute inset-0 bg-cover bg-center"
         style={
           city.heroImageUrl
             ? { backgroundImage: `url(${city.heroImageUrl})` }
             : undefined
         }
       />
-      <div aria-hidden className="absolute inset-0 bg-black/40" />
+      <div aria-hidden className="absolute inset-0 bg-black/35" />
 
-      <div className="relative mx-auto max-w-3xl px-4 py-24 text-center text-white sm:py-32">
-        <h1 className="text-4xl font-bold tracking-tight text-balance sm:text-5xl">
-          Find the right attorney in {city.name}
+      <div className="relative mx-auto w-full max-w-4xl px-4 py-20 text-center text-white">
+        <h1
+          className="font-bold tracking-tight text-balance"
+          style={{ fontSize: "clamp(2.5rem, 6vw, 4rem)" }}
+        >
+          {headline}
         </h1>
-        <p className="mt-4 text-lg text-white/85">
-          Compare {city.name}, {city.state} law firms by practice area and
-          Google rating — free to search, no signup needed.
+        <p className="mx-auto mt-4 max-w-2xl text-lg text-white/90">
+          {subtext}
         </p>
 
         {/* Plain GET form: crawlable, works without JS. T11 turns ?q= into
@@ -76,7 +85,7 @@ export async function Hero({ city }: { city: HeroCity }) {
           />
           <button
             type="submit"
-            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80"
+            className="rounded-lg bg-brand-red px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-red/85"
           >
             Search
           </button>
@@ -89,7 +98,7 @@ export async function Hero({ city }: { city: HeroCity }) {
               <li key={area.slug}>
                 <a
                   href={`/${city.slug}?practiceArea=${area.slug}`}
-                  className="inline-block rounded-full border border-white/40 bg-white/10 px-3.5 py-1.5 text-sm text-white backdrop-blur transition-colors hover:bg-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+                  className="inline-block rounded-full border border-white/70 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                 >
                   {area.name}
                 </a>

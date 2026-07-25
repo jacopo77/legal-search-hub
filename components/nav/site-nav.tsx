@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { Scale } from "lucide-react";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
-import { buttonVariants } from "@/components/ui/button";
 import { CitySelector, type CitySelectorCity } from "./city-selector";
 
 // Sitewide header. Server Component: reads the cities table directly so the
@@ -24,16 +23,33 @@ export async function SiteNav() {
   const cities = await getCities();
 
   return (
-    <header className="border-b border-border">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2 font-semibold">
-          <Scale className="size-5 text-primary" aria-hidden />
-          Legal Search Hub
+    <header className="border-b border-border bg-white">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+        <Link href="/" className="flex items-center gap-2.5">
+          <Image
+            src="/Untitled_design.png"
+            alt="Legal Search Hub"
+            width={40}
+            height={40}
+            className="size-10 rounded-md"
+            priority
+          />
+          <span className="text-lg font-bold tracking-tight text-navy">
+            Legal Search Hub
+          </span>
         </Link>
-        <nav className="flex items-center gap-1">
+        <nav className="flex items-center gap-1 sm:gap-2">
           <CitySelector cities={cities} />
-          {/* T14 builds this route (free signup flow). */}
-          <Link href="/list-your-firm" className={buttonVariants({ size: "sm" })}>
+          <Link
+            href="/sign-in"
+            className="hidden rounded-lg px-2.5 py-2 text-sm font-medium text-navy transition-colors hover:bg-muted sm:inline-block"
+          >
+            Login / Register
+          </Link>
+          <Link
+            href="/list-your-firm"
+            className="inline-flex h-9 items-center rounded-lg border-2 border-navy px-4 text-sm font-semibold text-navy transition-colors hover:bg-navy hover:text-white"
+          >
             List Your Firm
           </Link>
         </nav>

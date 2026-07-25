@@ -13,7 +13,7 @@ export function PremiumListingCard({
   citySlug: string;
 }) {
   return (
-    <li className="rounded-xl border-2 border-primary/30 bg-card p-5 shadow-md ring-1 ring-primary/10">
+    <li className="rounded-xl border border-border bg-card p-5 shadow-sm">
       <div className="flex items-start gap-4">
         {firm.logoUrl && (
           <Image
@@ -29,12 +29,12 @@ export function PremiumListingCard({
             <h3 className="text-lg font-semibold">
               <Link
                 href={`/${citySlug}/firms/${firm.slug}`}
-                className="hover:text-primary hover:underline"
+                className="hover:text-navy hover:underline"
               >
                 {firm.name}
               </Link>
             </h3>
-            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+            <span className="rounded-full bg-navy px-2 py-0.5 text-xs font-medium text-white">
               Premium
             </span>
           </div>
@@ -66,7 +66,7 @@ export function PremiumListingCard({
       {firm.phone && (
         <a
           href={`tel:${firm.phone.replace(/[^0-9+]/g, "")}`}
-          className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+          className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-navy hover:underline"
         >
           <Phone className="size-4" aria-hidden />
           {firm.phone}
