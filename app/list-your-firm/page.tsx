@@ -5,7 +5,7 @@ import { SignupForm } from "@/components/list-your-firm/signup-form";
 // "List Your Firm" — free signup flow (T14). Server page fetches the
 // select options; the form itself is a leaf client component.
 export const metadata: Metadata = {
-  title: "List Your Firm — Legal Search Hub",
+  title: "List Your Firm",
   description:
     "Add your law firm to the Legal Search Hub directory. Free listings include your contact info, hours, and one practice area.",
 };

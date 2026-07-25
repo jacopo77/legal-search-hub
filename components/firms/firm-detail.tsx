@@ -3,6 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Globe, Phone, MapPin, BadgeCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { env } from "@/lib/env";
 import { GoogleRatingBadge } from "@/components/listings/google-rating-badge";
 import { ClaimRequestForm } from "@/components/firms/claim-request-form";
 import { LeadForm } from "@/components/firms/lead-form";
@@ -103,8 +104,38 @@ export async function FirmDetail({
   // Premium-only long bio, falling back to the short one (§4.4).
   const bio = (isPremium && firm.bio_long) || firm.bio_short;
 
+  // JSON-LD structured data (T22): schema.org/Attorney (a LocalBusiness
+  // subtype). Only fields the firm actually has are emitted; the rating
+  // comes from our cached Google values, never a live call.
+  const jsonLd: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Attorney",
+    name: firm.name,
+    url: `${env.site.url()}/${citySlug}/firms/${firm.slug}`,
+    ...(firm.address ? { address: firm.address } : {}),
+    ...(firm.phone ? { telephone: firm.phone } : {}),
+    ...(firm.website ? { sameAs: [firm.website] } : {}),
+    ...(isPremium && firm.logo_url ? { image: firm.logo_url } : {}),
+    ...(firm.google_rating !== null && firm.google_review_count !== null
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: firm.google_rating,
+            reviewCount: firm.google_review_count,
+          },
+        }
+      : {}),
+  };
+
   return (
     <article className="mx-auto max-w-6xl px-4 py-10">
+      <script
+        type="application/ld+json"
+        // Escape "<" so the JSON can't break out of the script tag.
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
       {checkoutStatus === "success" && (
         <p className="mb-6 rounded-lg border border-primary/40 bg-primary/5 px-4 py-3 text-sm leading-6">
           Payment received — this listing moves to Premium as soon as Stripe

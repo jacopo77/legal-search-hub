@@ -5,7 +5,7 @@ import { NationalHome } from "@/components/home/national-home";
 // HOMEPAGE_MODE (CLAUDE.md rule 2). Deliberately unlinked from SiteNav
 // for now — built and crawlable for SEO, surfaced later (T22 confirms).
 export const metadata: Metadata = {
-  title: "Legal Search Hub — Find the right attorney in your city",
+  title: "Find the right attorney in your city",
   description:
     "Legal Search Hub is a curated directory of local law firms. Browse by city and compare firms by practice area and Google rating.",
 };
