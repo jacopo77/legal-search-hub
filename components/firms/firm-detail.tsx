@@ -5,7 +5,7 @@ import { Globe, Phone, MapPin, BadgeCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { GoogleRatingBadge } from "@/components/listings/google-rating-badge";
 import { ClaimRequestForm } from "@/components/firms/claim-request-form";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 
 // Full firm profile (ARCHITECTURE.md §4.4). Public readers only ever see
 // status='live' rows — that filter stays here in the query layer.
@@ -221,6 +221,27 @@ export async function FirmDetail({
                 <input type="hidden" name="firmId" value={firm.id} />
                 <Button type="submit">Upgrade to Premium</Button>
               </form>
+            </section>
+          )}
+
+          {/* Owner edit entry point (T20): premium owners only. */}
+          {isOwner && isPremium && (
+            <section
+              aria-labelledby="owner-heading"
+              className="mt-10 rounded-xl border border-border bg-card p-6"
+            >
+              <h2 id="owner-heading" className="text-lg font-semibold">
+                Your premium listing
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                Keep your logo, photos, practice areas, and bio up to date.
+              </p>
+              <Link
+                href={`/${citySlug}/firms/${firmSlug}/edit`}
+                className={buttonVariants({ className: "mt-4" })}
+              >
+                Edit premium profile
+              </Link>
             </section>
           )}
 
