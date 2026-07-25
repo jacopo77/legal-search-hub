@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Globe, Phone, MapPin, BadgeCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { GoogleRatingBadge } from "@/components/listings/google-rating-badge";
+import { ClaimRequestForm } from "@/components/firms/claim-request-form";
 
 // Full firm profile (ARCHITECTURE.md §4.4). Public readers only ever see
 // status='live' rows — that filter stays here in the query layer.
@@ -178,8 +179,8 @@ export async function FirmDetail({
             </section>
           )}
 
-          {/* Claim CTA: only on unclaimed listings (owner_id null). T17
-              mounts the claim/edit request form at this anchor. */}
+          {/* Claim/edit intake (T17): only on unclaimed listings
+              (owner_id null). */}
           {firm.owner_id === null && (
             <section
               id="claim"
@@ -193,7 +194,7 @@ export async function FirmDetail({
                 Claim this listing to update your info, or suggest an edit.
                 Every request is reviewed by our team before anything changes.
               </p>
-              {/* T17: claim/edit request form goes here */}
+              <ClaimRequestForm firmId={firm.id} firmName={firm.name} />
             </section>
           )}
         </div>

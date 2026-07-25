@@ -24,7 +24,8 @@ export async function POST(
     .from("firm_change_requests")
     .update({ status: "resolved" })
     .eq("id", id)
-    .eq("status", "pending");
+    // Open requests are 'pending' or 'highlevel_synced' — both resolvable.
+    .in("status", ["pending", "highlevel_synced"]);
   if (error) {
     console.error("admin/change-requests: status update failed", error);
     return Response.json(

@@ -19,6 +19,9 @@ type PendingFirmRow = {
 type ChangeRequestRow = {
   id: string;
   type: "claim" | "edit";
+  // 'pending' = HighLevel sync failed/pending; 'highlevel_synced' = synced.
+  // Both are open until an admin resolves the request.
+  status: "pending" | "highlevel_synced" | "resolved";
   requester_name: string;
   requester_email: string;
   requester_phone: string | null;
@@ -51,9 +54,11 @@ export async function ModerationQueue() {
     supabase
       .from("firm_change_requests")
       .select(
-        "id, type, requester_name, requester_email, requester_phone, message, created_at, firms(name, slug)",
+        "id, type, status, requester_name, requester_email, requester_phone, message, created_at, firms(name, slug)",
       )
-      .eq("status", "pending")
+      // Open = anything not yet resolved. 'highlevel_synced' only records
+      // that the HighLevel task fired — the request still needs review.
+      .in("status", ["pending", "highlevel_synced"])
       .order("created_at"),
   ]);
 
@@ -160,6 +165,11 @@ export async function ModerationQueue() {
                     </td>
                     <td className="text-muted-foreground px-4 py-2 capitalize">
                       {req.type}
+                      {req.status === "pending" && (
+                        <div className="text-xs text-amber-600">
+                          HighLevel sync failed
+                        </div>
+                      )}
                     </td>
                     <td className="text-muted-foreground px-4 py-2">
                       <div>{req.requester_name}</div>
