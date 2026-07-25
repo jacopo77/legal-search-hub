@@ -49,9 +49,13 @@ export async function POST(request: Request) {
       const session = event.data.object as Stripe.Checkout.Session;
       const firmId = session.client_reference_id;
       if (!firmId) {
-        console.error("webhooks/stripe: checkout session missing firm id", {
-          sessionId: session.id,
-        });
+        // A session we didn't create (e.g. a dashboard payment link). Not
+        // an error — but it means a payment with no automatic upgrade;
+        // reconcile manually. Never 500: Stripe can't fix this by retrying.
+        console.error(
+          "webhooks/stripe: checkout session missing firm id — reconcile manually",
+          { sessionId: session.id, customer: session.customer },
+        );
         break;
       }
       const subscriptionId =
@@ -63,12 +67,41 @@ export async function POST(request: Request) {
           ? session.customer
           : (session.customer?.id ?? null);
 
-      const { data: firm, error } = await supabase
+      const { data: existing } = await supabase
+        .from("firms")
+        .select("id, name, status, tier, stripe_subscription_id, owner_id")
+        .eq("id", firmId)
+        .maybeSingle();
+      if (!existing) {
+        console.error("webhooks/stripe: checkout for unknown firm", {
+          sessionId: session.id,
+          firmId,
+        });
+        break;
+      }
+      // Idempotency: Stripe redelivers on any non-200/slow response. If the
+      // firm is already premium on this subscription, the first delivery
+      // fully processed — skip everything, especially the HighLevel
+      // opportunity, which is NOT idempotent.
+      if (
+        existing.tier === "premium" &&
+        existing.stripe_subscription_id === subscriptionId
+      ) {
+        break;
+      }
+      if (existing.status !== "live") {
+        // Payment succeeded but the firm is pending/suspended — billing and
+        // moderation state now diverge; an admin should look at this.
+        console.warn("webhooks/stripe: upgrading non-live firm", {
+          firmId,
+          status: existing.status,
+        });
+      }
+
+      const { error } = await supabase
         .from("firms")
         .update({ tier: "premium", stripe_subscription_id: subscriptionId })
-        .eq("id", firmId)
-        .select("id, name, owner_id")
-        .single();
+        .eq("id", firmId);
       if (error) {
         console.error("webhooks/stripe: premium upgrade failed", error);
         return Response.json(
@@ -76,6 +109,7 @@ export async function POST(request: Request) {
           { status: 500 },
         );
       }
+      const firm = existing;
 
       if (customerId && firm.owner_id) {
         const { error: profileError } = await supabase
@@ -133,15 +167,26 @@ export async function POST(request: Request) {
 
     case "customer.subscription.deleted": {
       const subscription = event.data.object as Stripe.Subscription;
-      const { error } = await supabase
+      const { data: reverted, error } = await supabase
         .from("firms")
         .update({ tier: "free", stripe_subscription_id: null })
-        .eq("stripe_subscription_id", subscription.id);
+        .eq("stripe_subscription_id", subscription.id)
+        .select("id");
       if (error) {
         console.error("webhooks/stripe: tier revert failed", error);
         return Response.json(
           { error: "Could not revert tier" },
           { status: 500 },
+        );
+      }
+      if (!reverted || reverted.length === 0) {
+        // Zero-row updates aren't errors — but a miss here means billing
+        // state and local state diverged (e.g. the completed event hadn't
+        // landed yet). Retry-safe: Stripe's redelivery of completed will
+        // re-match; anything else needs manual reconciliation.
+        console.error(
+          "webhooks/stripe: subscription deleted but no firm matched — reconcile manually",
+          { subscriptionId: subscription.id },
         );
       }
       break;

@@ -14,11 +14,6 @@ import { env } from "@/lib/env";
 // under a per-firm path prefix, and gallery removal deletes the Storage
 // object along with its row so removed photos don't linger in the bucket.
 
-const IMAGE_TYPES: Record<string, string> = {
-  "image/jpeg": "jpg",
-  "image/png": "png",
-  "image/webp": "webp",
-};
 const LOGO_MAX_BYTES = 2 * 1024 * 1024;
 const GALLERY_MAX_BYTES = 5 * 1024 * 1024;
 const GALLERY_MAX_IMAGES = 12;
@@ -27,7 +22,29 @@ type EditFirmRow = {
   id: string;
   tier: "free" | "premium";
   owner_id: string | null;
+  logo_url: string | null;
 };
+
+// Magic-byte sniffing: file.type is attacker-supplied, so the allowlist is
+// enforced against the actual bytes. Returns the extension to use, or null.
+async function sniffImageExtension(file: File): Promise<string | null> {
+  const b = new Uint8Array(await file.slice(0, 12).arrayBuffer());
+  if (b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff) return "jpg";
+  if (b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47)
+    return "png";
+  if (
+    b[0] === 0x52 && // R
+    b[1] === 0x49 && // I
+    b[2] === 0x46 && // F
+    b[3] === 0x46 && // F
+    b[8] === 0x57 && // W
+    b[9] === 0x45 && // E
+    b[10] === 0x42 && // B
+    b[11] === 0x50 // P
+  )
+    return "webp";
+  return null;
+}
 
 function publicUrl(bucket: string, path: string): string {
   return `${env.supabase.url()}/storage/v1/object/public/${bucket}/${path}`;
@@ -50,7 +67,7 @@ export async function POST(
   const admin = createAdminClient();
   const { data } = await admin
     .from("firms")
-    .select("id, tier, owner_id")
+    .select("id, tier, owner_id, logo_url")
     .eq("id", id)
     .maybeSingle();
   const firm = data as unknown as EditFirmRow | null;
@@ -95,31 +112,36 @@ export async function POST(
     console.error("edit: bio update failed", firmError);
     return Response.json({ error: "Could not save — please try again" }, { status: 500 });
   }
-  const { error: deleteAreasError } = await admin
+  // Practice-area set: upsert-then-prune, never delete-then-insert — a
+  // mid-flight failure must not leave the firm with zero areas (it would
+  // silently drop out of every practice-area filter).
+  const { error: upsertAreasError } = await admin
     .from("firm_practice_areas")
-    .delete()
-    .eq("firm_id", firm.id);
-  if (deleteAreasError) {
-    console.error("edit: practice-area reset failed", deleteAreasError);
-    return Response.json({ error: "Could not save — please try again" }, { status: 500 });
-  }
-  const { error: insertAreasError } = await admin
-    .from("firm_practice_areas")
-    .insert(
+    .upsert(
       input.practiceAreaIds.map((practice_area_id) => ({
         firm_id: firm.id,
         practice_area_id,
       })),
+      { onConflict: "firm_id,practice_area_id", ignoreDuplicates: true },
     );
-  if (insertAreasError) {
-    console.error("edit: practice-area insert failed", insertAreasError);
+  if (upsertAreasError) {
+    console.error("edit: practice-area upsert failed", upsertAreasError);
+    return Response.json({ error: "Could not save — please try again" }, { status: 500 });
+  }
+  const { error: pruneAreasError } = await admin
+    .from("firm_practice_areas")
+    .delete()
+    .eq("firm_id", firm.id)
+    .not("practice_area_id", "in", `(${input.practiceAreaIds.join(",")})`);
+  if (pruneAreasError) {
+    console.error("edit: practice-area prune failed", pruneAreasError);
     return Response.json({ error: "Could not save — please try again" }, { status: 500 });
   }
 
   // Logo upload (optional; replaces the current one).
   const logo = form.get("logo");
   if (logo instanceof File && logo.size > 0) {
-    const ext = IMAGE_TYPES[logo.type];
+    const ext = await sniffImageExtension(logo);
     if (!ext || logo.size > LOGO_MAX_BYTES) {
       return Response.json(
         { error: "Logo must be a JPEG, PNG, or WebP under 2 MB" },
@@ -138,7 +160,19 @@ export async function POST(
       .from("firms")
       .update({ logo_url: publicUrl("firm-logos", path) })
       .eq("id", firm.id);
-    if (logoError) console.error("edit: logo_url update failed", logoError);
+    if (logoError) {
+      console.error("edit: logo_url update failed", logoError);
+    } else {
+      // Best-effort cleanup of the replaced object so logos don't
+      // accumulate in the bucket.
+      const prefix = publicUrl("firm-logos", "");
+      if (firm.logo_url?.startsWith(prefix)) {
+        const { error: removeError } = await admin.storage
+          .from("firm-logos")
+          .remove([firm.logo_url.slice(prefix.length)]);
+        if (removeError) console.error("edit: old logo removal failed", removeError);
+      }
+    }
   }
 
   // Gallery removals: delete the Storage object and its row together.
@@ -152,8 +186,11 @@ export async function POST(
       .select("image_url");
     const prefix = publicUrl("firm-gallery", "");
     const paths = (removed ?? [])
-      .map((r) => (r.image_url as string).replace(prefix, ""))
-      .filter(Boolean);
+      .map((r) => r.image_url as string)
+      // Only remove objects whose URL we actually recognize — a foreign or
+      // legacy URL must not become a bogus storage path.
+      .filter((url) => url.startsWith(prefix))
+      .map((url) => url.slice(prefix.length));
     if (paths.length > 0) {
       const { error: storageError } = await admin.storage
         .from("firm-gallery")
@@ -188,7 +225,7 @@ export async function POST(
     let sortOrder = ((maxRow?.sort_order as number | undefined) ?? -1) + 1;
 
     for (const file of galleryFiles) {
-      const ext = IMAGE_TYPES[file.type];
+      const ext = await sniffImageExtension(file);
       if (!ext || file.size > GALLERY_MAX_BYTES) {
         return Response.json(
           { error: "Gallery photos must be JPEG, PNG, or WebP under 5 MB each" },

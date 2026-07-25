@@ -71,6 +71,12 @@ export async function createOrUpdateContact(input: {
     },
   );
   if (!result.ok) return result;
+  // Validate the shape instead of casting blind: a 2xx without the expected
+  // wrapper would otherwise throw TypeError at the call site — which in the
+  // Stripe webhook becomes a 500 and a retry loop.
+  if (!result.data.contact?.id) {
+    return { ok: false, status: 200, error: "HighLevel returned no contact id" };
+  }
   return { ok: true, data: result.data.contact };
 }
 
@@ -96,6 +102,13 @@ export async function createOpportunity(input: {
     },
   );
   if (!result.ok) return result;
+  if (!result.data.opportunity?.id) {
+    return {
+      ok: false,
+      status: 200,
+      error: "HighLevel returned no opportunity id",
+    };
+  }
   return { ok: true, data: result.data.opportunity };
 }
 
@@ -117,5 +130,8 @@ export async function createTask(input: {
     },
   );
   if (!result.ok) return result;
+  if (!result.data.task?.id) {
+    return { ok: false, status: 200, error: "HighLevel returned no task id" };
+  }
   return { ok: true, data: result.data.task };
 }
