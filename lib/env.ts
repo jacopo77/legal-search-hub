@@ -10,6 +10,12 @@ function required(name: string): string {
 }
 
 export const env = {
+  site: {
+    // Public origin used for absolute URLs (metadataBase, sitemap,
+    // canonicals). Falls back to the dev-server origin locally; must be set
+    // to the real domain in production (T26 checks this).
+    url: () => process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3100",
+  },
   supabase: {
     url: () => required("NEXT_PUBLIC_SUPABASE_URL"),
     anonKey: () => required("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
