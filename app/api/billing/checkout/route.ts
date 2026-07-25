@@ -21,7 +21,7 @@ type CheckoutFirmRow = {
   tier: "free" | "premium";
   status: string;
   owner_id: string | null;
-  cities: { slug: string } | null;
+  cities: { slug: string; status: string } | null;
 };
 
 export async function POST(request: Request) {
@@ -32,21 +32,25 @@ export async function POST(request: Request) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user || !firmId) {
+  if (!user) {
     return NextResponse.redirect(new URL("/sign-in", origin), 303);
+  }
+  if (!firmId) {
+    return Response.json({ error: "Missing firmId" }, { status: 400 });
   }
 
   const admin = createAdminClient();
   const { data } = await admin
     .from("firms")
-    .select("id, name, slug, tier, status, owner_id, cities(slug)")
+    .select("id, name, slug, tier, status, owner_id, cities(slug, status)")
     .eq("id", firmId)
     .maybeSingle();
   const firm = data as unknown as CheckoutFirmRow | null;
 
-  // Only the owner can upgrade their own live, free-tier listing. Anything
-  // else (not theirs, already premium, not yet approved) just bounces back
-  // to the firm page without creating a session.
+  // Only the owner can upgrade their own live, free-tier listing, in a live
+  // city. Anything else (not theirs, already premium, not yet approved,
+  // city taken back to coming_soon) just bounces back to the firm page
+  // without creating a session.
   const firmPath = firm?.cities
     ? `/${firm.cities.slug}/firms/${firm.slug}`
     : "/";
@@ -54,7 +58,8 @@ export async function POST(request: Request) {
     !firm ||
     firm.owner_id !== user.id ||
     firm.tier !== "free" ||
-    firm.status !== "live"
+    firm.status !== "live" ||
+    firm.cities?.status !== "live"
   ) {
     return NextResponse.redirect(new URL(firmPath, origin), 303);
   }

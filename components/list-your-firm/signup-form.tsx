@@ -26,7 +26,9 @@ export function SignupForm({
   cities: SignupOption[];
   practiceAreas: SignupOption[];
 }) {
-  const [submitted, setSubmitted] = useState<"new" | "existing" | null>(null);
+  const [submitted, setSubmitted] = useState<{
+    magicLinkSent: boolean;
+  } | null>(null);
   const {
     register,
     handleSubmit,
@@ -49,7 +51,7 @@ export function SignupForm({
       });
       return;
     }
-    setSubmitted(body.isNewOwner ? "new" : "existing");
+    setSubmitted({ magicLinkSent: Boolean(body.magicLinkSent) });
   }
 
   if (submitted) {
@@ -59,13 +61,8 @@ export function SignupForm({
         <p className="mt-2 text-sm leading-6 text-muted-foreground">
           Our team reviews every new listing before it goes live — you&apos;ll
           hear from us soon.
-          {submitted === "new" && (
-            <>
-              {" "}
-              We&apos;ve also emailed you a magic sign-in link so you can
-              manage your listing once it&apos;s approved.
-            </>
-          )}
+          {submitted.magicLinkSent &&
+            " We've also emailed you a magic sign-in link so you can manage your listing once it's approved."}
         </p>
       </div>
     );

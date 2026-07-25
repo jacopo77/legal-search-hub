@@ -104,6 +104,12 @@ export async function FirmDetail({
   // Premium-only long bio, falling back to the short one (§4.4).
   const bio = (isPremium && firm.bio_long) || firm.bio_short;
 
+  // Render-time scheme allowlist: owners can update their own row via
+  // PostgREST (RLS), bypassing the signup schema's protocol check — so the
+  // href must never trust the DB value (stored-XSS vector).
+  const websiteUrl =
+    firm.website && /^https?:\/\//i.test(firm.website) ? firm.website : null;
+
   // JSON-LD structured data (T22): schema.org/Attorney (a LocalBusiness
   // subtype). Only fields the firm actually has are emitted; the rating
   // comes from our cached Google values, never a live call.
@@ -317,10 +323,10 @@ export async function FirmDetail({
                 {firm.address}
               </li>
             )}
-            {firm.website && (
+            {websiteUrl && (
               <li>
                 <a
-                  href={firm.website}
+                  href={websiteUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-primary hover:underline"

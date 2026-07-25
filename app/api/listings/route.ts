@@ -73,11 +73,27 @@ export async function POST(request: Request) {
     userId = created.user.id;
     isNewOwner = true;
   } else if (createError?.message.toLowerCase().includes("already")) {
-    const { data: list, error: listError } =
-      await supabase.auth.admin.listUsers({ perPage: 1000 });
-    const existing = list?.users.find((u) => u.email?.toLowerCase() === email);
-    if (listError || !existing) {
-      console.error("listings: user lookup failed", listError);
+    // Page through all auth users — listUsers returns one page at a time,
+    // and a first-page-only lookup permanently blocks any email whose
+    // account sits past the first 1000 users.
+    let existing;
+    let page = 1;
+    for (;;) {
+      const { data: list, error: listError } =
+        await supabase.auth.admin.listUsers({ page, perPage: 1000 });
+      if (listError) {
+        console.error("listings: user lookup failed", listError);
+        return Response.json(
+          { error: "Could not create your account — please try again" },
+          { status: 500 },
+        );
+      }
+      existing = list.users.find((u) => u.email?.toLowerCase() === email);
+      if (existing || list.users.length < 1000) break;
+      page++;
+    }
+    if (!existing) {
+      console.error("listings: user lookup failed — account not found");
       return Response.json(
         { error: "Could not create your account — please try again" },
         { status: 500 },
@@ -152,8 +168,10 @@ export async function POST(request: Request) {
   }
 
   // Magic link for brand-new owners so they can sign in later. Failure here
-  // doesn't block the signup — admin can resend. Lands on /auth/callback,
-  // which exchanges the code for a session.
+  // doesn't block the signup — the form's copy reflects whether it actually
+  // sent, and /sign-in is the recovery path. Lands on /auth/callback, which
+  // exchanges the code for a session.
+  let magicLinkSent = false;
   if (isNewOwner) {
     const { error: otpError } = await supabase.auth.signInWithOtp({
       email,
@@ -162,7 +180,11 @@ export async function POST(request: Request) {
         emailRedirectTo: `${new URL(request.url).origin}/auth/callback`,
       },
     });
-    if (otpError) console.error("listings: magic link failed", otpError);
+    if (otpError) {
+      console.error("listings: magic link failed", otpError);
+    } else {
+      magicLinkSent = true;
+    }
   }
 
   // HighLevel new-signup trigger — best-effort (rule 7).
@@ -176,5 +198,7 @@ export async function POST(request: Request) {
     console.error("listings: HighLevel sync failed", highlevel.error);
   }
 
-  return Response.json({ ok: true, isNewOwner }, { status: 201 });
+  // Note: no isNewOwner in the response — it would enumerate which emails
+  // have accounts. magicLinkSent keeps the UI copy honest instead.
+  return Response.json({ ok: true, magicLinkSent }, { status: 201 });
 }

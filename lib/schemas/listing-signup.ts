@@ -9,7 +9,9 @@ export const listingSignupSchema = z.object({
   practiceAreaId: z.uuid(),
   phone: z.string().trim().min(7).max(30),
   address: z.string().trim().min(5).max(300),
-  website: z.union([z.literal(""), z.url()]).optional(),
+  // z.url() validates syntax, not scheme — without the protocol allowlist
+  // it accepts javascript: URLs (stored-XSS vector on the firm page).
+  website: z.union([z.literal(""), z.url({ protocol: /^https?$/ })]).optional(),
   bioShort: z.string().trim().min(10).max(500),
   // Owner account — magic link is sent to this email for brand-new owners.
   ownerName: z.string().trim().min(2).max(120),
