@@ -4,9 +4,11 @@ import { CityPageContent } from "@/components/city/city-page-content";
 // cities row, never a new route file (CLAUDE.md rule 1).
 export default async function CityPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ city: string }>;
+  searchParams: Promise<{ q?: string; practiceArea?: string }>;
 }) {
   const { city } = await params;
-  return <CityPageContent citySlug={city} />;
+  return <CityPageContent citySlug={city} searchParams={await searchParams} />;
 }

@@ -12,7 +12,7 @@ async function getFirms(cityId: string, tier: "premium" | "free") {
   const { data, error } = await supabase
     .from("firms")
     .select(
-      `id, slug, name, phone, address, bio_short, logo_url,
+      `id, slug, name, tier, phone, address, bio_short, logo_url,
        google_rating, google_review_count,
        firm_practice_areas(practice_areas(slug, name))`,
     )

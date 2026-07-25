@@ -4,6 +4,7 @@ export type ListingFirm = {
   id: string;
   slug: string;
   name: string;
+  tier: "free" | "premium";
   phone: string | null;
   address: string | null;
   bioShort: string | null;
@@ -20,6 +21,7 @@ export type FirmRow = {
   id: string;
   slug: string;
   name: string;
+  tier: "free" | "premium";
   phone: string | null;
   address: string | null;
   bio_short: string | null;
@@ -36,6 +38,7 @@ export function mapFirmRow(row: FirmRow): ListingFirm {
     id: row.id,
     slug: row.slug,
     name: row.name,
+    tier: row.tier,
     phone: row.phone,
     address: row.address,
     bioShort: row.bio_short,
