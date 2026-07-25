@@ -58,7 +58,7 @@ export async function Hero({ city }: { city: HeroCity }) {
         <form
           action={`/${city.slug}`}
           role="search"
-          className="mx-auto mt-8 flex max-w-xl items-center gap-2 rounded-xl bg-white p-2 shadow-lg"
+          className="mx-auto mt-8 flex max-w-xl items-center gap-2 rounded-xl bg-white p-2 shadow-lg focus-within:ring-3 focus-within:ring-white/70"
         >
           <Search
             className="ml-2 size-5 shrink-0 text-muted-foreground"
@@ -89,7 +89,7 @@ export async function Hero({ city }: { city: HeroCity }) {
               <li key={area.slug}>
                 <a
                   href={`/${city.slug}?practiceArea=${area.slug}`}
-                  className="inline-block rounded-full border border-white/40 bg-white/10 px-3.5 py-1.5 text-sm text-white backdrop-blur transition-colors hover:bg-white/25"
+                  className="inline-block rounded-full border border-white/40 bg-white/10 px-3.5 py-1.5 text-sm text-white backdrop-blur transition-colors hover:bg-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                 >
                   {area.name}
                 </a>

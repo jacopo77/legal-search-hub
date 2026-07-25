@@ -84,7 +84,7 @@ export async function ModerationQueue() {
         {firms.length === 0 ? (
           <p className="text-muted-foreground mt-3 text-sm">Nothing pending.</p>
         ) : (
-          <div className="border-border mt-3 overflow-hidden rounded-xl border">
+          <div className="border-border mt-3 overflow-x-auto rounded-xl border">
             <table className="w-full text-left text-sm">
               <thead className="bg-muted/50 text-muted-foreground">
                 <tr>
@@ -145,7 +145,7 @@ export async function ModerationQueue() {
         {requests.length === 0 ? (
           <p className="text-muted-foreground mt-3 text-sm">Nothing open.</p>
         ) : (
-          <div className="border-border mt-3 overflow-hidden rounded-xl border">
+          <div className="border-border mt-3 overflow-x-auto rounded-xl border">
             <table className="w-full text-left text-sm">
               <thead className="bg-muted/50 text-muted-foreground">
                 <tr>
