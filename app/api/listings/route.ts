@@ -152,11 +152,15 @@ export async function POST(request: Request) {
   }
 
   // Magic link for brand-new owners so they can sign in later. Failure here
-  // doesn't block the signup — admin can resend.
+  // doesn't block the signup — admin can resend. Lands on /auth/callback,
+  // which exchanges the code for a session.
   if (isNewOwner) {
     const { error: otpError } = await supabase.auth.signInWithOtp({
       email,
-      options: { shouldCreateUser: false },
+      options: {
+        shouldCreateUser: false,
+        emailRedirectTo: `${new URL(request.url).origin}/auth/callback`,
+      },
     });
     if (otpError) console.error("listings: magic link failed", otpError);
   }

@@ -5,6 +5,7 @@ import { Globe, Phone, MapPin, BadgeCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { GoogleRatingBadge } from "@/components/listings/google-rating-badge";
 import { ClaimRequestForm } from "@/components/firms/claim-request-form";
+import { Button } from "@/components/ui/button";
 
 // Full firm profile (ARCHITECTURE.md §4.4). Public readers only ever see
 // status='live' rows — that filter stays here in the query layer.
@@ -73,12 +74,23 @@ async function getFirm(citySlug: string, firmSlug: string) {
 export async function FirmDetail({
   citySlug,
   firmSlug,
+  checkoutStatus,
 }: {
   citySlug: string;
   firmSlug: string;
+  // Set by /api/billing/checkout's redirect back from Stripe (T18).
+  checkoutStatus?: string;
 }) {
   const firm = await getFirm(citySlug, firmSlug);
   if (!firm) notFound();
+
+  // Owner-only UI (upgrade button) — a second client just for the session
+  // read; the firm data above is public and came through the anon path.
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const isOwner = user !== null && firm.owner_id === user.id;
 
   const isPremium = firm.tier === "premium";
   const practiceAreas = firm.firm_practice_areas
@@ -92,6 +104,17 @@ export async function FirmDetail({
 
   return (
     <article className="mx-auto max-w-6xl px-4 py-10">
+      {checkoutStatus === "success" && (
+        <p className="mb-6 rounded-lg border border-primary/40 bg-primary/5 px-4 py-3 text-sm leading-6">
+          Payment received — this listing moves to Premium as soon as Stripe
+          confirms the subscription (usually a few seconds).
+        </p>
+      )}
+      {checkoutStatus === "error" && (
+        <p className="mb-6 rounded-lg bg-destructive/10 px-4 py-3 text-sm leading-6 text-destructive">
+          Something went wrong starting checkout — please try again.
+        </p>
+      )}
       <nav className="text-sm text-muted-foreground">
         <Link href={`/${citySlug}`} className="hover:text-foreground hover:underline">
           {citySlug.charAt(0).toUpperCase() + citySlug.slice(1)} firms
@@ -176,6 +199,28 @@ export async function FirmDetail({
                   </li>
                 ))}
               </ul>
+            </section>
+          )}
+
+          {/* Owner upgrade CTA (T18): only the signed-in owner of a live,
+              free-tier listing sees this. Plain form POST → 303 to Stripe;
+              the tier flips in the webhook (T19). */}
+          {isOwner && firm.tier === "free" && (
+            <section
+              aria-labelledby="upgrade-heading"
+              className="mt-10 rounded-xl border border-border bg-card p-6"
+            >
+              <h2 id="upgrade-heading" className="text-lg font-semibold">
+                Upgrade to Premium
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                Add your logo, a photo gallery, multiple practice areas, a
+                longer bio, and a contact form on this page.
+              </p>
+              <form action="/api/billing/checkout" method="POST" className="mt-4">
+                <input type="hidden" name="firmId" value={firm.id} />
+                <Button type="submit">Upgrade to Premium</Button>
+              </form>
             </section>
           )}
 
