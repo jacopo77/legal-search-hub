@@ -35,8 +35,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .order("sort_order"),
     supabase
       .from("firms")
-      .select("slug, updated_at, cities(slug)")
-      .eq("status", "live"),
+      // !inner + the embedded filter keep firms in coming_soon cities out
+      // of the sitemap — their pages 404 until the city goes live.
+      .select("slug, updated_at, cities!inner(slug)")
+      .eq("status", "live")
+      .eq("cities.status", "live"),
   ]);
 
   const cityRoutes: MetadataRoute.Sitemap = (cities ?? []).map((city) => ({
