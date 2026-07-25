@@ -43,4 +43,9 @@ export const env = {
   cron: {
     secret: () => required("CRON_SECRET"),
   },
+  sentry: {
+    // Optional: empty string disables Sentry (local dev default). Set in
+    // production (T26). Public DSN — safe for the browser bundle.
+    dsn: () => process.env.NEXT_PUBLIC_SENTRY_DSN ?? "",
+  },
 } as const;
