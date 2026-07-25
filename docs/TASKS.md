@@ -195,6 +195,45 @@ _Depends on: everything above._
 
 ---
 
+## Phase 2 — post-launch tasks (from the SmartDirectoryAI audit)
+
+Numbered follow-on work surfaced by the dashboard audit
+(`docs/SMARTDIRECTORY-AUDIT.md` + `docs/smartdirectory-audit/feature-comparison.md`).
+Still not to be started before launch — but unlike the prose backlog below,
+these are specced enough to build when Phase 2 opens.
+
+**T27. HighLevel nurture + outreach workflows (feature parity)**
+Model the audit's "Outreach Workflows" (Free Listing Outreach, Premium
+Upgrade Push, Marketing Services Push, Customer Replied) in our HighLevel
+account, triggered by the four tags the app already fires (`new-signup`,
+`claim-request`/`edit-request`, `premium-checkout`, `firm-lead`). This is
+the SmartDirectoryAI parity work: configuration in HighLevel, no app code.
+_Depends on: T26 (live HighLevel account with real events flowing)._
+
+**T28. Bot protection + rate limiting on public endpoints**
+Their platform ships a reCAPTCHA toggle; our pre-launch audit deferred
+rate limiting. Add bot protection (Turnstile/reCAPTCHA or honeypot) to the
+three public POST routes (`/api/listings`, `/api/leads`,
+`/api/listings/[id]/claim`) plus request rate limiting (e.g. Upstash).
+_Depends on: T26._
+
+**T29. Pricing engine: annual plan, trials, coupons**
+Their Plans tab ships annual billing, trial periods, and coupons — real
+monetization levers we don't have. Stripe-side: add an annual Price,
+trial support on Checkout, promotion codes; webhook already handles the
+events, verify trial/coupon edge cases.
+_Depends on: T19, T26 (live Stripe)._
+
+**T30. Admin directory-health dashboard**
+Their dashboard's listings counts (free/claimed/premium), Marketplace
+Health, and Health Score are an *internal* reporting layer — distinct from
+the firm-facing analytics dashboard that stays out of scope. Extend
+`/admin` with key metrics: listings by status/tier, claim rate, premium
+conversion, leads per period.
+_Depends on: T26 (real usage data flowing)._
+
+---
+
 ## Phase 2 — explicitly out of scope for v1
 
 Do not build any of the following without a new planning pass. Listed here
