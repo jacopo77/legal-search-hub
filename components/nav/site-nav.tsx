@@ -24,28 +24,28 @@ export async function SiteNav() {
 
   return (
     <header className="border-b border-border bg-white">
-      <div className="mx-auto flex h-24 max-w-6xl items-center justify-between px-4">
+      <div className="mx-auto flex h-36 max-w-6xl items-center justify-between px-4">
         <Link href="/" className="flex items-center">
           <Image
             src="/Untitled_design.png"
             alt=""
             width={500}
             height={500}
-            className="h-[80px] w-auto"
+            className="h-[130px] w-auto"
             priority
           />
         </Link>
-        <nav className="flex items-center gap-1 sm:gap-2">
+        <nav className="flex items-center gap-2 sm:gap-4">
           <CitySelector cities={cities} />
           <Link
             href="/sign-in"
-            className="hidden rounded-lg px-2.5 py-2 text-sm font-medium text-navy transition-colors hover:bg-muted sm:inline-block"
+            className="hidden rounded-lg px-4 py-2.5 text-base font-medium text-navy transition-colors hover:bg-muted sm:inline-block"
           >
             Login / Register
           </Link>
           <Link
             href="/list-your-firm"
-            className="inline-flex h-9 items-center rounded-lg border-2 border-navy px-4 text-sm font-semibold text-navy transition-colors hover:bg-navy hover:text-white"
+            className="inline-flex h-11 items-center rounded-lg border-2 border-navy px-5 text-base font-semibold text-navy transition-colors hover:bg-navy hover:text-white"
           >
             List Your Firm
           </Link>
