@@ -112,12 +112,10 @@ export async function ListingSection({
   tier,
   cityId,
   citySlug,
-  cityName,
 }: {
   tier: "premium" | "free";
   cityId: string;
   citySlug: string;
-  cityName: string;
 }) {
   const firms = await getFirms(cityId, tier);
 
@@ -143,10 +141,7 @@ export async function ListingSection({
             />
           ))}
           {Array.from({ length: placeholderCount }).map((_, i) => (
-            <PremiumPlaceholderCard
-              key={`placeholder-${i}`}
-              cityName={cityName}
-            />
+            <PremiumPlaceholderCard key={`placeholder-${i}`} />
           ))}
         </ul>
       </section>
