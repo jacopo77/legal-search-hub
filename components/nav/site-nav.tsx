@@ -24,14 +24,14 @@ export async function SiteNav() {
 
   return (
     <header className="border-b border-border bg-white">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+      <div className="mx-auto flex h-24 max-w-6xl items-center justify-between px-4">
         <Link href="/" className="flex items-center">
           <Image
             src="/Untitled_design.png"
-            alt="Legal Search Hub"
-            width={50}
-            height={50}
-            className="h-[50px] w-auto"
+            alt=""
+            width={500}
+            height={500}
+            className="h-[80px] w-auto"
             priority
           />
         </Link>
