@@ -39,9 +39,7 @@ export function FreeListingCard({
           </h3>
 
           {primaryArea && (
-            <span className="mt-1 inline-block rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-navy">
-              {primaryArea.name}
-            </span>
+            <span className="text-sm italic text-gray-500">{primaryArea.name}</span>
           )}
 
           {firm.phone && (
@@ -69,9 +67,7 @@ export function FreeListingCard({
           </h3>
 
           {primaryArea && (
-            <span className="mt-1 inline-block rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-navy">
-              {primaryArea.name}
-            </span>
+            <span className="text-sm italic text-gray-500">{primaryArea.name}</span>
           )}
 
           {firm.phone && (
