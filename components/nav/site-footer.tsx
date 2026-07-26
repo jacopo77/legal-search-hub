@@ -16,24 +16,24 @@ const DAY_LABELS = [
 // Profile verbatim).
 export function SiteFooter() {
   return (
-    <footer className="bg-[#3D87C0]">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-10 text-white sm:grid-cols-2 lg:grid-cols-3">
+    <footer className="border-t border-border bg-muted/40">
+      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-10 sm:grid-cols-2 lg:grid-cols-3">
         <div>
-          <p className="font-semibold text-white">{COMPANY_NAP.name}</p>
-          <address className="mt-3 text-sm leading-6 not-italic text-white/80">
+          <p className="font-semibold">{COMPANY_NAP.name}</p>
+          <address className="mt-3 text-sm leading-6 text-muted-foreground not-italic">
             {COMPANY_NAP.address}
             <br />
             <a
               href={`tel:${COMPANY_NAP.phone.replace(/[^0-9+]/g, "")}`}
-              className="text-white hover:text-white/80 hover:underline"
+              className="hover:text-foreground hover:underline"
             >
               {COMPANY_NAP.phone}
             </a>
           </address>
         </div>
         <div>
-          <p className="text-sm font-semibold text-white">Hours</p>
-          <dl className="mt-3 space-y-1 text-sm text-white/80">
+          <p className="text-sm font-semibold">Hours</p>
+          <dl className="mt-3 space-y-1 text-sm text-muted-foreground">
             {DAY_LABELS.map(([key, label]) => (
               <div key={key} className="flex justify-between gap-6">
                 <dt>{label}</dt>
@@ -54,8 +54,8 @@ export function SiteFooter() {
           </div>
         </div>
       </div>
-      <div className="border-t border-white/20">
-        <p className="mx-auto max-w-6xl px-4 py-4 text-xs text-white/60">
+      <div className="border-t border-border">
+        <p className="mx-auto max-w-6xl px-4 py-4 text-xs text-muted-foreground">
           © {new Date().getFullYear()} {COMPANY_NAP.name}. All rights reserved.
         </p>
       </div>
