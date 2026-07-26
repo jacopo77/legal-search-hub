@@ -73,24 +73,11 @@ export function FirmLogoPlaceholder({ firmName }: { firmName: string }) {
         fontFamily="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
       >
         {lines.map((line, i) => (
-          <text key={i} x="200" y={140 + i * 32}>
+          <text key={i} x="200" y={145 + i * 34}>
             {line}
           </text>
         ))}
       </g>
-
-      {/* Claim CTA */}
-      <text
-        x="200"
-        y="255"
-        textAnchor="middle"
-        fill="#F59E0B"
-        fontSize="14"
-        fontWeight="500"
-        fontFamily="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
-      >
-        Claim Your Profile →
-      </text>
     </svg>
   );
 }
