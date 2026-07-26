@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { COMPANY_NAP } from "@/lib/config";
 
 const DAY_LABELS = [
@@ -41,11 +42,17 @@ export function SiteFooter() {
             ))}
           </dl>
         </div>
-        {/* Legal Insights — Phase 2 */}
-        <div
-          aria-hidden
-          className="hidden rounded-lg border border-dashed border-white/20 lg:block"
-        />
+        <div className="flex items-center justify-center">
+          <div className="relative h-[90px] w-[161px]">
+            <Image
+              src="/Untitled_design_cropped.png"
+              alt=""
+              fill
+              className="object-contain"
+              sizes="161px"
+            />
+          </div>
+        </div>
       </div>
       <div className="border-t border-white/20">
         <p className="mx-auto max-w-6xl px-4 py-4 text-xs text-white/60">
