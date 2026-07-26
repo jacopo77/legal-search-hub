@@ -183,7 +183,22 @@ export async function FirmDetail({
                     Premium
                   </span>
                 )}
+                {firm.owner_id === null ? (
+                  <span className="rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
+                    Unclaimed listing
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
+                    <BadgeCheck className="size-3" aria-hidden />
+                    Verified
+                  </span>
+                )}
               </div>
+              {practiceAreas.length > 0 && (
+                <p className="mt-1 text-sm italic text-muted-foreground">
+                  {practiceAreas.map((a) => a.name).join(", ")}
+                </p>
+              )}
               <div className="mt-1">
                 <GoogleRatingBadge
                   rating={firm.google_rating}
@@ -205,9 +220,12 @@ export async function FirmDetail({
           </div>
 
           {bio && (
-            <p className="mt-6 max-w-2xl leading-7 text-foreground/90">
-              {bio}
-            </p>
+            <section className="mt-10">
+              <h2 className="text-lg font-semibold">About</h2>
+              <p className="mt-3 max-w-2xl leading-7 text-foreground/90">
+                {bio}
+              </p>
+            </section>
           )}
 
           {firm.bar_number && (

@@ -40,6 +40,11 @@ export const env = {
   googlePlaces: {
     apiKey: () => required("GOOGLE_PLACES_API_KEY"),
   },
+  googleMaps: {
+    // Public Maps Embed API key — used for iframe embeds on firm detail pages.
+    // Optional: falls back to the no-key embed format if unset.
+    embedApiKey: () => process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "",
+  },
   cron: {
     secret: () => required("CRON_SECRET"),
   },
