@@ -23,7 +23,13 @@ function wrapName(name: string): string[] {
   return [first, rest];
 }
 
-export function FirmLogoPlaceholder({ firmName }: { firmName: string }) {
+export function FirmLogoPlaceholder({
+  firmName,
+  practiceArea,
+}: {
+  firmName: string;
+  practiceArea?: string;
+}) {
   const displayName = firmName.length > 46 ? firmName.slice(0, 43) + "…" : firmName;
   const lines = wrapName(displayName);
 
@@ -78,6 +84,20 @@ export function FirmLogoPlaceholder({ firmName }: { firmName: string }) {
           </text>
         ))}
       </g>
+
+      {practiceArea && (
+        <text
+          x="200"
+          y={145 + (lines.length - 1) * 34 + 28}
+          textAnchor="middle"
+          fill="#D1D5DB"
+          fontSize="18"
+          fontStyle="italic"
+          fontFamily="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+        >
+          {practiceArea}
+        </text>
+      )}
     </svg>
   );
 }

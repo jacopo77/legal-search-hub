@@ -58,7 +58,7 @@ export function FreeListingCard({
         className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-shadow hover:shadow-sm"
       >
         <div className="relative aspect-[4/3] w-full bg-gray-100">
-          <FirmLogoPlaceholder firmName={firm.name} />
+          <FirmLogoPlaceholder firmName={firm.name} practiceArea={primaryArea?.name} />
         </div>
 
         <div className="p-4">
