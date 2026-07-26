@@ -7,6 +7,7 @@ import { env } from "@/lib/env";
 import { GoogleRatingBadge } from "@/components/listings/google-rating-badge";
 import { ClaimRequestForm } from "@/components/firms/claim-request-form";
 import { LeadForm } from "@/components/firms/lead-form";
+import { FirmMap } from "@/components/firms/firm-map";
 import { Button, buttonVariants } from "@/components/ui/button";
 
 // Full firm profile (ARCHITECTURE.md §4.4). Public readers only ever see
@@ -363,6 +364,10 @@ export async function FirmDetail({
               </h3>
               <LeadForm firmId={firm.id} firmName={firm.name} />
             </>
+          )}
+
+          {firm.address && (
+            <FirmMap address={firm.address} firmName={firm.name} />
           )}
         </aside>
       </div>
