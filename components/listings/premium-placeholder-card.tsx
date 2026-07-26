@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Gavel } from "lucide-react";
+import { GavelPlaceholderImage } from "./gavel-placeholder-image";
 
 // Placeholder card for an available premium/featured slot.
 export function PremiumPlaceholderCard() {
@@ -9,8 +9,8 @@ export function PremiumPlaceholderCard() {
         Featured
       </span>
 
-      <div className="flex h-32 w-full items-center justify-center rounded-lg bg-gray-100">
-        <Gavel className="size-12 text-muted-foreground/60" aria-hidden />
+      <div className="relative h-32 w-full overflow-hidden rounded-lg">
+        <GavelPlaceholderImage />
       </div>
 
       <div className="mt-6 flex flex-1 flex-col">
