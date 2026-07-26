@@ -26,14 +26,16 @@ export async function SiteNav() {
     <header className="border-b border-border bg-white">
       <div className="mx-auto flex h-40 max-w-6xl items-center justify-between px-4">
         <Link href="/" className="flex items-center">
-          <Image
-            src="/Untitled_design_cropped.png"
-            alt=""
-            width={500}
-            height={280}
-            className="h-[150px] w-auto"
-            priority
-          />
+          <div className="relative h-[150px] w-[268px]">
+            <Image
+              src="/Untitled_design_cropped.png"
+              alt=""
+              fill
+              className="object-contain"
+              priority
+              sizes="268px"
+            />
+          </div>
         </Link>
         <nav className="flex items-center gap-2 sm:gap-4">
           <CitySelector cities={cities} />
