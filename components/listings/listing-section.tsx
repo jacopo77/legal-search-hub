@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Crown } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { PremiumListingCard } from "./premium-listing-card";
 import { FreeListingCard } from "./free-listing-card";
@@ -29,28 +30,80 @@ async function getFirms(cityId: string, tier: "premium" | "free") {
   return (data as unknown as FirmRow[]).map(mapFirmRow);
 }
 
+function PremiumPlaceholderCard({ cityName }: { cityName: string }) {
+  return (
+    <li className="relative rounded-xl border-2 border-dashed border-border bg-muted/30 p-5 transition-colors hover:bg-muted/50">
+      <Link href="/list-your-firm" className="flex h-full flex-col">
+        <div className="flex items-center gap-2 text-navy">
+          <Crown className="size-5" aria-hidden />
+          <span className="text-sm font-semibold">Claim this featured spot</span>
+        </div>
+        <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
+          Upgrade to a premium listing and appear at the top of {cityName} search results.
+        </p>
+        <span className="mt-4 inline-flex items-center text-sm font-semibold text-primary hover:underline">
+          List your firm →
+        </span>
+      </Link>
+    </li>
+  );
+}
+
 export async function ListingSection({
   tier,
   cityId,
   citySlug,
+  cityName,
 }: {
   tier: "premium" | "free";
   cityId: string;
   citySlug: string;
+  cityName: string;
 }) {
   const firms = await getFirms(cityId, tier);
 
-  // An empty premium section renders nothing at all — no "coming soon"
-  // filler for a paid placement.
-  if (firms.length === 0 && tier === "premium") return null;
+  if (tier === "premium") {
+    const placeholderCount = Math.max(0, 3 - firms.length);
+
+    return (
+      <section aria-labelledby="premium-listings-heading">
+        <div className="flex items-center justify-between">
+          <h2
+            id="premium-listings-heading"
+            className="text-xl font-semibold tracking-tight"
+          >
+            Featured firms
+          </h2>
+          {firms.length > 0 && (
+            <span className="text-sm text-muted-foreground">
+              {firms.length} premium listing{firms.length === 1 ? "" : "s"}
+            </span>
+          )}
+        </div>
+
+        <ul className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {firms.map((firm) => (
+            <PremiumListingCard
+              key={firm.id}
+              firm={firm}
+              citySlug={citySlug}
+            />
+          ))}
+          {Array.from({ length: placeholderCount }).map((_, i) => (
+            <PremiumPlaceholderCard key={`placeholder-${i}`} cityName={cityName} />
+          ))}
+        </ul>
+      </section>
+    );
+  }
 
   return (
-    <section aria-labelledby={`${tier}-listings-heading`}>
+    <section aria-labelledby="free-listings-heading">
       <h2
-        id={`${tier}-listings-heading`}
+        id="free-listings-heading"
         className="text-xl font-semibold tracking-tight"
       >
-        {tier === "premium" ? "Premium firms" : "All firms"}
+        All firms
       </h2>
 
       {firms.length === 0 ? (
@@ -62,24 +115,10 @@ export async function ListingSection({
           to be the first.
         </p>
       ) : (
-        <ul
-          className={
-            tier === "premium"
-              ? "mt-5 grid gap-5 sm:grid-cols-2"
-              : "mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
-          }
-        >
-          {firms.map((firm) =>
-            tier === "premium" ? (
-              <PremiumListingCard
-                key={firm.id}
-                firm={firm}
-                citySlug={citySlug}
-              />
-            ) : (
-              <FreeListingCard key={firm.id} firm={firm} citySlug={citySlug} />
-            ),
-          )}
+        <ul className="mt-5 grid gap-4 sm:grid-cols-2">
+          {firms.map((firm) => (
+            <FreeListingCard key={firm.id} firm={firm} citySlug={citySlug} />
+          ))}
         </ul>
       )}
     </section>

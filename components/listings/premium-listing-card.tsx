@@ -1,10 +1,10 @@
 import Link from "next/link";
-import Image from "next/image";
-import { Phone } from "lucide-react";
 import type { ListingFirm } from "./types";
+import { FirmLogo } from "./firm-logo";
 import { GoogleRatingBadge } from "./google-rating-badge";
 
-// Premium tier card: logo, distinct elevated styling, top placement.
+// Premium tier card: elevated horizontal layout with left accent border,
+// larger logo box, and a "Featured" badge.
 export function PremiumListingCard({
   firm,
   citySlug,
@@ -13,65 +13,54 @@ export function PremiumListingCard({
   citySlug: string;
 }) {
   return (
-    <li className="rounded-xl border border-border bg-card p-5 shadow-sm">
-      <div className="flex items-start gap-4">
-        {firm.logoUrl && (
-          <Image
-            src={firm.logoUrl}
-            alt={`${firm.name} logo`}
-            width={56}
-            height={56}
-            className="size-14 shrink-0 rounded-lg border border-border object-contain"
-          />
-        )}
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <h3 className="text-lg font-semibold">
-              <Link
-                href={`/${citySlug}/firms/${firm.slug}`}
-                className="hover:text-navy hover:underline"
-              >
-                {firm.name}
-              </Link>
+    <li className="relative rounded-xl border border-border border-l-4 border-l-navy bg-card shadow-sm transition-colors hover:bg-muted/30">
+      <Link
+        href={`/${citySlug}/firms/${firm.slug}`}
+        className="flex items-start gap-4 p-5"
+      >
+        <FirmLogo url={firm.logoUrl} name={firm.name} size="lg" />
+
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="text-lg font-semibold leading-tight text-foreground hover:text-primary hover:underline">
+              {firm.name}
             </h3>
-            <span className="rounded-full bg-navy px-2 py-0.5 text-xs font-medium text-white">
-              Premium
+            <span className="shrink-0 rounded-full bg-brand-red px-2 py-0.5 text-xs font-semibold text-white">
+              Featured
             </span>
           </div>
-          <GoogleRatingBadge
-            rating={firm.googleRating}
-            reviewCount={firm.googleReviewCount}
-          />
+
+          <div className="mt-1">
+            <GoogleRatingBadge
+              rating={firm.googleRating}
+              reviewCount={firm.googleReviewCount}
+            />
+          </div>
+
+          {firm.bioShort && (
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              {firm.bioShort}
+            </p>
+          )}
+
+          {firm.practiceAreas.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {firm.practiceAreas.map((area) => (
+                <span
+                  key={area.slug}
+                  className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-navy"
+                >
+                  {area.name}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {firm.phone && (
+            <p className="mt-3 text-sm font-medium text-navy">{firm.phone}</p>
+          )}
         </div>
-      </div>
-
-      {firm.bioShort && (
-        <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          {firm.bioShort}
-        </p>
-      )}
-
-      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-        {firm.practiceAreas.map((area) => (
-          <Link
-            key={area.slug}
-            href={`/${citySlug}?practiceArea=${area.slug}`}
-            className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium hover:bg-muted/70"
-          >
-            {area.name}
-          </Link>
-        ))}
-      </div>
-
-      {firm.phone && (
-        <a
-          href={`tel:${firm.phone.replace(/[^0-9+]/g, "")}`}
-          className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-navy hover:underline"
-        >
-          <Phone className="size-4" aria-hidden />
-          {firm.phone}
-        </a>
-      )}
+      </Link>
     </li>
   );
 }

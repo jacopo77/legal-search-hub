@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { Phone } from "lucide-react";
 import type { ListingFirm } from "./types";
+import { FirmLogo } from "./firm-logo";
 import { GoogleRatingBadge } from "./google-rating-badge";
 
-// Free tier card: the standard directory card — no logo, no premium styling.
+// Free tier card: compact horizontal directory card with logo fallback.
 export function FreeListingCard({
   firm,
   citySlug,
@@ -12,47 +12,49 @@ export function FreeListingCard({
   citySlug: string;
 }) {
   return (
-    <li className="rounded-xl border border-border bg-muted/30 p-5">
-      <h3 className="font-semibold">
-        <Link
-          href={`/${citySlug}/firms/${firm.slug}`}
-          className="hover:text-navy hover:underline"
-        >
-          {firm.name}
-        </Link>
-      </h3>
-      <GoogleRatingBadge
-        rating={firm.googleRating}
-        reviewCount={firm.googleReviewCount}
-      />
+    <li className="relative rounded-xl border border-border bg-muted/30 transition-colors hover:bg-muted/50">
+      <Link
+        href={`/${citySlug}/firms/${firm.slug}`}
+        className="flex items-start gap-4 p-4"
+      >
+        <FirmLogo url={firm.logoUrl} name={firm.name} size="sm" />
 
-      {firm.bioShort && (
-        <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">
-          {firm.bioShort}
-        </p>
-      )}
+        <div className="min-w-0 flex-1">
+          <h3 className="font-semibold leading-tight text-foreground hover:text-primary hover:underline">
+            {firm.name}
+          </h3>
 
-      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-        {firm.practiceAreas.map((area) => (
-          <Link
-            key={area.slug}
-            href={`/${citySlug}?practiceArea=${area.slug}`}
-            className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium hover:bg-muted/70"
-          >
-            {area.name}
-          </Link>
-        ))}
-      </div>
+          <div className="mt-1">
+            <GoogleRatingBadge
+              rating={firm.googleRating}
+              reviewCount={firm.googleReviewCount}
+            />
+          </div>
 
-      {firm.phone && (
-        <a
-          href={`tel:${firm.phone.replace(/[^0-9+]/g, "")}`}
-          className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-navy hover:underline"
-        >
-          <Phone className="size-4" aria-hidden />
-          {firm.phone}
-        </a>
-      )}
+          {firm.bioShort && (
+            <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+              {firm.bioShort}
+            </p>
+          )}
+
+          {firm.practiceAreas.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {firm.practiceAreas.map((area) => (
+                <span
+                  key={area.slug}
+                  className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-navy"
+                >
+                  {area.name}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {firm.phone && (
+            <p className="mt-2 text-sm font-medium text-navy">{firm.phone}</p>
+          )}
+        </div>
+      </Link>
     </li>
   );
 }
