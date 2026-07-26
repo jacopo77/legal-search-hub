@@ -26,7 +26,7 @@ export async function SiteNav() {
     <header className="border-b border-border bg-white">
       <div className="mx-auto flex h-24 max-w-6xl items-center justify-between px-4">
         <Link href="/" className="flex items-center">
-          <div className="relative h-[90px] w-[161px]">
+          <div className="relative h-[90px] w-[205px]">
             <Image
               src="/Untitled_design_cropped.png"
               alt=""
