@@ -101,17 +101,15 @@ export async function ListingSection({
             ))}
           </ul>
 
-          {firms.length > 6 && (
-            <div className="mt-8 text-center">
-              <Link
-                href={`/${citySlug}/firms`}
-                className="inline-flex items-center gap-2 rounded-lg border-2 border-navy px-5 py-2.5 text-sm font-semibold text-navy transition-colors hover:bg-navy hover:text-white"
-              >
-                View All Firms
-                <ArrowRight className="size-4" aria-hidden />
-              </Link>
-            </div>
-          )}
+          <div className="mt-8 text-center">
+            <Link
+              href={`/${citySlug}/firms`}
+              className="inline-flex items-center gap-2 rounded-lg border-2 border-navy px-5 py-2.5 text-sm font-semibold text-navy transition-colors hover:bg-navy hover:text-white"
+            >
+              View All Firms
+              <ArrowRight className="size-4" aria-hidden />
+            </Link>
+          </div>
         </>
       )}
     </section>

@@ -14,14 +14,14 @@ export function PremiumListingCard({
   const primaryArea = firm.practiceAreas[0];
 
   return (
-    <li className="relative flex flex-col rounded-xl border border-border bg-card p-6 shadow-sm">
-      <span className="absolute right-4 top-4 rounded-full bg-amber-400 px-2 py-0.5 text-xs font-bold text-navy">
+    <li className="relative flex flex-col rounded-xl border border-border bg-card p-8 shadow-sm">
+      <span className="absolute right-4 top-4 rounded-full bg-amber-400 px-3 py-1 text-xs font-bold text-navy shadow">
         Featured
       </span>
 
-      <div className="flex h-24 w-full items-center justify-center rounded-lg bg-muted">
+      <div className="flex h-32 w-full items-center justify-center rounded-lg bg-gray-100">
         {firm.logoUrl ? (
-          <div className="relative h-20 w-full">
+          <div className="relative h-28 w-full">
             <Image
               src={firm.logoUrl}
               alt={`${firm.name} logo`}
@@ -31,12 +31,12 @@ export function PremiumListingCard({
             />
           </div>
         ) : (
-          <Gavel className="size-10 text-muted-foreground/60" aria-hidden />
+          <Gavel className="size-12 text-muted-foreground/60" aria-hidden />
         )}
       </div>
 
-      <div className="mt-5 flex flex-1 flex-col">
-        <h3 className="text-lg font-semibold text-foreground">
+      <div className="mt-6 flex flex-1 flex-col">
+        <h3 className="text-xl font-semibold text-foreground">
           <Link
             href={`/${citySlug}/firms/${firm.slug}`}
             className="hover:text-primary hover:underline"
@@ -57,7 +57,7 @@ export function PremiumListingCard({
 
         <Link
           href={`/${citySlug}/firms/${firm.slug}`}
-          className="mt-4 inline-flex w-full items-center justify-center rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary/85"
+          className="mt-5 inline-flex w-full items-center justify-center rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary/85"
         >
           View Profile
         </Link>
