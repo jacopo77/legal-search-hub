@@ -66,11 +66,12 @@ const CITIES = [
 // The 6 launch practice areas (ARCHITECTURE.md §4.2). Admin-extensible later.
 const PRACTICE_AREAS = [
   { slug: "family-law", name: "Family Law", sort_order: 1 },
-  { slug: "dui", name: "DUI", sort_order: 2 },
-  { slug: "personal-injury", name: "Personal Injury", sort_order: 3 },
-  { slug: "estate-planning", name: "Estate Planning", sort_order: 4 },
-  { slug: "immigration", name: "Immigration", sort_order: 5 },
-  { slug: "business-law", name: "Business Law", sort_order: 6 },
+  { slug: "divorce", name: "Divorce", sort_order: 2 },
+  { slug: "dui", name: "DUI", sort_order: 3 },
+  { slug: "personal-injury", name: "Personal Injury", sort_order: 4 },
+  { slug: "estate-planning", name: "Estate Planning", sort_order: 5 },
+  { slug: "immigration", name: "Immigration", sort_order: 6 },
+  { slug: "business-law", name: "Business Law", sort_order: 7 },
 ];
 
 async function upsertCities() {

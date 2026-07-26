@@ -94,16 +94,37 @@ export async function Hero({ city }: { city: HeroCity }) {
         {/* Practice-area chips: plain filter links, not text search (§8). */}
         {practiceAreas.length > 0 && (
           <ul className="mt-6 flex flex-wrap justify-center gap-2">
-            {practiceAreas.map((area) => (
-              <li key={area.slug}>
-                <a
-                  href={`/${city.slug}?practiceArea=${area.slug}`}
-                  className="inline-block rounded-full border border-white/70 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
-                >
-                  {area.name}
-                </a>
-              </li>
-            ))}
+            {practiceAreas.flatMap((area) =>
+              area.slug === "family-law"
+                ? [
+                    <li key={area.slug}>
+                      <a
+                        href={`/${city.slug}?practiceArea=${area.slug}`}
+                        className="inline-block rounded-full border border-white/70 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+                      >
+                        {area.name}
+                      </a>
+                    </li>,
+                    <li key="divorce">
+                      <a
+                        href={`/${city.slug}?practiceArea=divorce`}
+                        className="inline-block rounded-full border border-white/70 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+                      >
+                        Divorce
+                      </a>
+                    </li>,
+                  ]
+                : [
+                    <li key={area.slug}>
+                      <a
+                        href={`/${city.slug}?practiceArea=${area.slug}`}
+                        className="inline-block rounded-full border border-white/70 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+                      >
+                        {area.name}
+                      </a>
+                    </li>,
+                  ],
+            )}
           </ul>
         )}
       </div>
