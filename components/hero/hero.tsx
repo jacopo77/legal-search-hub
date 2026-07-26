@@ -30,6 +30,18 @@ async function getPracticeAreas() {
 export async function Hero({ city }: { city: HeroCity }) {
   const practiceAreas = await getPracticeAreas();
 
+  // Insert Divorce chip immediately after Family Law for v1 launch.
+  const displayAreas = [...practiceAreas];
+  const familyLawIndex = displayAreas.findIndex(
+    (a) => a.slug === "family-law",
+  );
+  if (familyLawIndex !== -1) {
+    displayAreas.splice(familyLawIndex + 1, 0, {
+      slug: "divorce",
+      name: "Divorce",
+    });
+  }
+
   const headline = city.heroHeadline ?? `Find the right attorney in ${city.name}`;
   const subtext =
     city.heroSubtext ??
@@ -92,39 +104,18 @@ export async function Hero({ city }: { city: HeroCity }) {
         </form>
 
         {/* Practice-area chips: plain filter links, not text search (§8). */}
-        {practiceAreas.length > 0 && (
+        {displayAreas.length > 0 && (
           <ul className="mt-6 flex flex-wrap justify-center gap-2">
-            {practiceAreas.flatMap((area) =>
-              area.slug === "family-law"
-                ? [
-                    <li key={area.slug}>
-                      <a
-                        href={`/${city.slug}?practiceArea=${area.slug}`}
-                        className="inline-block rounded-full border border-white/70 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
-                      >
-                        {area.name}
-                      </a>
-                    </li>,
-                    <li key="divorce">
-                      <a
-                        href={`/${city.slug}?practiceArea=divorce`}
-                        className="inline-block rounded-full border border-white/70 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
-                      >
-                        Divorce
-                      </a>
-                    </li>,
-                  ]
-                : [
-                    <li key={area.slug}>
-                      <a
-                        href={`/${city.slug}?practiceArea=${area.slug}`}
-                        className="inline-block rounded-full border border-white/70 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
-                      >
-                        {area.name}
-                      </a>
-                    </li>,
-                  ],
-            )}
+            {displayAreas.map((area) => (
+              <li key={area.slug}>
+                <a
+                  href={`/${city.slug}?practiceArea=${area.slug}`}
+                  className="inline-block rounded-full border border-white/70 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+                >
+                  {area.name}
+                </a>
+              </li>
+            ))}
           </ul>
         )}
       </div>
