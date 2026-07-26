@@ -16,7 +16,7 @@ const DAY_LABELS = [
 // Profile verbatim).
 export function SiteFooter() {
   return (
-    <footer className="border-t border-white/10 bg-navy">
+    <footer className="border-t border-white/10 bg-[#1E3A5F]">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-10 text-white sm:grid-cols-2 lg:grid-cols-3">
         <div>
           <p className="font-semibold text-white">{COMPANY_NAP.name}</p>
