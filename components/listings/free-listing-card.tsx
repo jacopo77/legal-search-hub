@@ -78,7 +78,7 @@ export function FreeListingCard({
             <p className="mt-1 text-sm font-medium text-navy">{firm.phone}</p>
           )}
 
-          <span className="mt-3 inline-flex items-center gap-1 rounded-lg bg-amber-500/10 px-5 py-2.5 text-lg font-bold text-amber-500 transition-colors group-hover:bg-amber-500/20 group-hover:underline">
+          <span className="mt-3 block rounded-lg bg-amber-500/10 px-4 py-2 text-xl font-bold text-amber-500 transition-colors group-hover:bg-amber-500/20 group-hover:underline">
             Claim Your Profile →
           </span>
         </div>
