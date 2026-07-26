@@ -25,18 +25,15 @@ export async function SiteNav() {
   return (
     <header className="border-b border-border bg-white">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2.5">
+        <Link href="/" className="flex items-center">
           <Image
             src="/Untitled_design.png"
             alt="Legal Search Hub"
-            width={40}
-            height={40}
-            className="size-10 rounded-md"
+            width={50}
+            height={50}
+            className="h-[50px] w-auto"
             priority
           />
-          <span className="text-lg font-bold tracking-tight text-navy">
-            Legal Search Hub
-          </span>
         </Link>
         <nav className="flex items-center gap-1 sm:gap-2">
           <CitySelector cities={cities} />
