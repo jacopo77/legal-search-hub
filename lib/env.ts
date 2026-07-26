@@ -37,9 +37,6 @@ export const env = {
     apiKey: () => required("HIGHLEVEL_API_KEY"),
     locationId: () => required("HIGHLEVEL_LOCATION_ID"),
   },
-  googleMaps: {
-    apiKey: () => process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "",
-  },
   googlePlaces: {
     apiKey: () => required("GOOGLE_PLACES_API_KEY"),
   },

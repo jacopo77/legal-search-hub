@@ -367,7 +367,7 @@ export async function FirmDetail({
           )}
 
           {firm.address && (
-            <FirmMap address={firm.address} firmName={firm.name} />
+            <FirmMap address={firm.address} />
           )}
         </aside>
       </div>
