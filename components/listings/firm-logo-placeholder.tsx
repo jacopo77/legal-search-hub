@@ -92,7 +92,7 @@ export function FirmLogoPlaceholder({
           textAnchor="middle"
           fill="#D1D5DB"
           fontSize="18"
-          fontStyle="italic"
+          style={{ fontStyle: "italic" }}
           fontFamily="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
         >
           {practiceArea}
