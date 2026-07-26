@@ -1,8 +1,8 @@
 // Inline SVG placeholder for free-tier firms with no uploaded logo.
-// Aspect ratio 4:3, dark navy background with detailed gavel icon.
+// Aspect ratio 4:3, dark navy background with pre-built gavel icon.
 
 function wrapName(name: string): string[] {
-  const MAX_PER_LINE = 20;
+  const MAX_PER_LINE = 22;
   if (name.length <= MAX_PER_LINE) return [name];
 
   const mid = Math.floor(name.length / 2);
@@ -24,7 +24,7 @@ function wrapName(name: string): string[] {
 }
 
 export function FirmLogoPlaceholder({ firmName }: { firmName: string }) {
-  const displayName = firmName.length > 42 ? firmName.slice(0, 39) + "…" : firmName;
+  const displayName = firmName.length > 46 ? firmName.slice(0, 43) + "…" : firmName;
   const lines = wrapName(displayName);
 
   return (
@@ -36,58 +36,44 @@ export function FirmLogoPlaceholder({ firmName }: { firmName: string }) {
     >
       <rect width="400" height="300" fill="#1E3A5F" />
 
-      {/* Gavel icon group — handle (white), head (blue), rotated ~45° */}
-      <g transform="translate(200, 82) rotate(-45)">
-        {/* Handle */}
-        <rect
-          x="-7"
-          y="-50"
-          width="14"
-          height="100"
-          rx="7"
-          fill="#FFFFFF"
-        />
-        {/* Mallet head */}
-        <rect
-          x="-42"
-          y="-66"
-          width="84"
-          height="30"
-          rx="8"
+      {/* Pre-built gavel icon — 80×80, centered in upper portion */}
+      <svg x="160" y="30" width="80" height="80" viewBox="0 0 24 24">
+        <path
+          d="M9 3L6 6L10 10L13 7L9 3Z"
           fill="#3D87C0"
+          stroke="#3D87C0"
+          strokeWidth="1"
         />
-        {/* Head highlight */}
-        <rect
-          x="-38"
-          y="-64"
-          width="76"
-          height="4"
-          rx="2"
-          fill="#5BA3D4"
-          opacity="0.5"
+        <path
+          d="M13 7L10 10L14 14L17 11L13 7Z"
+          fill="#5B9FD4"
+          stroke="#5B9FD4"
+          strokeWidth="1"
         />
-      </g>
+        <path
+          d="M5 19L10 14"
+          stroke="#F59E0B"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+        />
+        <path
+          d="M3 21H9"
+          stroke="#F59E0B"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+        />
+      </svg>
 
-      {/* Sound block / base beneath the gavel */}
-      <rect
-        x="150"
-        y="150"
-        width="100"
-        height="14"
-        rx="5"
-        fill="#F59E0B"
-      />
-
-      {/* Firm name — large, bold, white, centered, two-line max */}
+      {/* Firm name — bold, white, 26px, centered, two-line max */}
       <g
-        fontSize="28"
+        fontSize="26"
         fontWeight="bold"
         fill="#FFFFFF"
         textAnchor="middle"
         fontFamily="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
       >
         {lines.map((line, i) => (
-          <text key={i} x="200" y={182 + i * 34}>
+          <text key={i} x="200" y={140 + i * 32}>
             {line}
           </text>
         ))}
@@ -96,10 +82,10 @@ export function FirmLogoPlaceholder({ firmName }: { firmName: string }) {
       {/* Claim CTA */}
       <text
         x="200"
-        y="260"
+        y="255"
         textAnchor="middle"
         fill="#F59E0B"
-        fontSize="12"
+        fontSize="14"
         fontWeight="500"
         fontFamily="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
       >
