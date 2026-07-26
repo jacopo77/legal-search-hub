@@ -1,10 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Phone } from "lucide-react";
+import { Gavel } from "lucide-react";
 import type { ListingFirm } from "./types";
-import { GoogleRatingBadge } from "./google-rating-badge";
 
-// Premium tier card: logo, distinct elevated styling, top placement.
+// Premium/featured firm card: elevated layout with Featured badge.
 export function PremiumListingCard({
   firm,
   citySlug,
@@ -12,66 +11,57 @@ export function PremiumListingCard({
   firm: ListingFirm;
   citySlug: string;
 }) {
+  const primaryArea = firm.practiceAreas[0];
+
   return (
-    <li className="rounded-xl border border-border bg-card p-5 shadow-sm">
-      <div className="flex items-start gap-4">
-        {firm.logoUrl && (
-          <Image
-            src={firm.logoUrl}
-            alt={`${firm.name} logo`}
-            width={56}
-            height={56}
-            className="size-14 shrink-0 rounded-lg border border-border object-contain"
-          />
-        )}
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <h3 className="text-lg font-semibold">
-              <Link
-                href={`/${citySlug}/firms/${firm.slug}`}
-                className="hover:text-navy hover:underline"
-              >
-                {firm.name}
-              </Link>
-            </h3>
-            <span className="rounded-full bg-amber-400 px-2 py-0.5 text-xs font-bold text-navy">
-              Featured
-            </span>
+    <li className="relative flex flex-col rounded-xl border border-border bg-card p-6 shadow-sm">
+      <span className="absolute right-4 top-4 rounded-full bg-amber-400 px-2 py-0.5 text-xs font-bold text-navy">
+        Featured
+      </span>
+
+      <div className="flex h-24 w-full items-center justify-center rounded-lg bg-muted">
+        {firm.logoUrl ? (
+          <div className="relative h-20 w-full">
+            <Image
+              src={firm.logoUrl}
+              alt={`${firm.name} logo`}
+              fill
+              className="object-contain p-2"
+              sizes="(max-width: 640px) 100vw, 33vw"
+            />
           </div>
-          <GoogleRatingBadge
-            rating={firm.googleRating}
-            reviewCount={firm.googleReviewCount}
-          />
-        </div>
+        ) : (
+          <Gavel className="size-10 text-muted-foreground/60" aria-hidden />
+        )}
       </div>
 
-      {firm.bioShort && (
-        <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          {firm.bioShort}
-        </p>
-      )}
-
-      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-        {firm.practiceAreas.map((area) => (
+      <div className="mt-5 flex flex-1 flex-col">
+        <h3 className="text-lg font-semibold text-foreground">
           <Link
-            key={area.slug}
-            href={`/${citySlug}?practiceArea=${area.slug}`}
-            className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium hover:bg-muted/70"
+            href={`/${citySlug}/firms/${firm.slug}`}
+            className="hover:text-primary hover:underline"
           >
-            {area.name}
+            {firm.name}
           </Link>
-        ))}
-      </div>
+        </h3>
 
-      {firm.phone && (
-        <a
-          href={`tel:${firm.phone.replace(/[^0-9+]/g, "")}`}
-          className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-navy hover:underline"
+        {primaryArea && (
+          <span className="mt-1 inline-block self-start rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-navy">
+            {primaryArea.name}
+          </span>
+        )}
+
+        {firm.phone && (
+          <p className="mt-2 text-sm font-medium text-navy">{firm.phone}</p>
+        )}
+
+        <Link
+          href={`/${citySlug}/firms/${firm.slug}`}
+          className="mt-4 inline-flex w-full items-center justify-center rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary/85"
         >
-          <Phone className="size-4" aria-hidden />
-          {firm.phone}
-        </a>
-      )}
+          View Profile
+        </Link>
+      </div>
     </li>
   );
 }
