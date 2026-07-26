@@ -69,14 +69,8 @@ export async function CityPageContent({
               tier="premium"
               cityId={city.id}
               citySlug={city.slug}
-              cityName={city.name}
             />
-            <ListingSection
-              tier="free"
-              cityId={city.id}
-              citySlug={city.slug}
-              cityName={city.name}
-            />
+            <ListingSection tier="free" cityId={city.id} citySlug={city.slug} />
           </>
         )}
       </div>

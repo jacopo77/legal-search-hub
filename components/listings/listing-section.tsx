@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Crown } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { PremiumListingCard } from "./premium-listing-card";
 import { FreeListingCard } from "./free-listing-card";
@@ -30,80 +29,62 @@ async function getFirms(cityId: string, tier: "premium" | "free") {
   return (data as unknown as FirmRow[]).map(mapFirmRow);
 }
 
-function PremiumPlaceholderCard({ cityName }: { cityName: string }) {
-  return (
-    <li className="relative rounded-xl border-2 border-dashed border-border bg-muted/30 p-5 transition-colors hover:bg-muted/50">
-      <Link href="/list-your-firm" className="flex h-full flex-col">
-        <div className="flex items-center gap-2 text-navy">
-          <Crown className="size-5" aria-hidden />
-          <span className="text-sm font-semibold">Claim this featured spot</span>
-        </div>
-        <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
-          Upgrade to a premium listing and appear at the top of {cityName} search results.
-        </p>
-        <span className="mt-4 inline-flex items-center text-sm font-semibold text-primary hover:underline">
-          List your firm →
-        </span>
-      </Link>
-    </li>
-  );
-}
-
 export async function ListingSection({
   tier,
   cityId,
   citySlug,
-  cityName,
 }: {
   tier: "premium" | "free";
   cityId: string;
   citySlug: string;
-  cityName: string;
 }) {
   const firms = await getFirms(cityId, tier);
 
   if (tier === "premium") {
-    const placeholderCount = Math.max(0, 3 - firms.length);
+    const featured = firms.slice(0, 3);
 
     return (
-      <section aria-labelledby="premium-listings-heading">
-        <div className="flex items-center justify-between">
-          <h2
-            id="premium-listings-heading"
-            className="text-xl font-semibold tracking-tight"
-          >
-            Featured firms
-          </h2>
-          {firms.length > 0 && (
-            <span className="text-sm text-muted-foreground">
-              {firms.length} premium listing{firms.length === 1 ? "" : "s"}
-            </span>
-          )}
-        </div>
+      <section aria-labelledby="featured-listings-heading">
+        <h2
+          id="featured-listings-heading"
+          className="text-xl font-semibold tracking-tight"
+        >
+          Featured Listings
+        </h2>
 
-        <ul className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {firms.map((firm) => (
-            <PremiumListingCard
-              key={firm.id}
-              firm={firm}
-              citySlug={citySlug}
-            />
-          ))}
-          {Array.from({ length: placeholderCount }).map((_, i) => (
-            <PremiumPlaceholderCard key={`placeholder-${i}`} cityName={cityName} />
-          ))}
-        </ul>
+        {featured.length === 0 ? (
+          <p className="mt-4 rounded-xl border border-dashed border-border p-6 text-sm text-muted-foreground">
+            No featured listings yet.{" "}
+            <Link href="/list-your-firm" className="text-primary hover:underline">
+              List your firm
+            </Link>{" "}
+            to be featured here.
+          </p>
+        ) : (
+          <ul className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {featured.map((firm) => (
+              <PremiumListingCard
+                key={firm.id}
+                firm={firm}
+                citySlug={citySlug}
+              />
+            ))}
+          </ul>
+        )}
       </section>
     );
   }
 
   return (
-    <section aria-labelledby="free-listings-heading">
+    <section
+      aria-labelledby="all-firms-heading"
+      className="border-t border-border pt-12"
+    >
       <h2
-        id="free-listings-heading"
+        id="all-firms-heading"
         className="text-xl font-semibold tracking-tight"
       >
-        All firms
+        All Firms
       </h2>
 
       {firms.length === 0 ? (
@@ -115,7 +96,7 @@ export async function ListingSection({
           to be the first.
         </p>
       ) : (
-        <ul className="mt-5 grid gap-4 sm:grid-cols-2">
+        <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {firms.map((firm) => (
             <FreeListingCard key={firm.id} firm={firm} citySlug={citySlug} />
           ))}
