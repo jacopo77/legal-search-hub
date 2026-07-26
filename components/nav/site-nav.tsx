@@ -24,16 +24,16 @@ export async function SiteNav() {
 
   return (
     <header className="border-b border-border bg-white">
-      <div className="mx-auto flex h-40 max-w-6xl items-center justify-between px-4">
+      <div className="mx-auto flex h-32 max-w-6xl items-center justify-between px-4">
         <Link href="/" className="flex items-center">
-          <div className="relative h-[150px] w-[268px]">
+          <div className="relative h-[120px] w-[214px]">
             <Image
               src="/Untitled_design_cropped.png"
               alt=""
               fill
               className="object-contain"
               priority
-              sizes="268px"
+              sizes="214px"
             />
           </div>
         </Link>
