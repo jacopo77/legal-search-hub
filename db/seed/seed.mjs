@@ -143,6 +143,7 @@ async function seedFirms(cityIds, practiceAreaIds) {
       logo_url: firm.logo_url ?? null,
       hours: firm.hours ?? null,
       bio_short: firm.bio_short ?? null,
+      bio_long: firm.bio_long ?? null,
       bar_number: firm.bar_number ?? null,
       google_place_id: firm.google_place_id ?? null,
     };

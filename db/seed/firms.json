@@ -8,6 +8,7 @@
     "website": "https://www.swlaw.com",
     "logo_url": null,
     "bio_short": "Arizona's largest law firm, founded in 1938, offering full-service business law including corporate, litigation, real estate, and tax matters from its downtown Phoenix office.",
+    "bio_long": "Founded in 1938 in Phoenix, Snell & Wilmer is one of the largest law firms in the western United States, with more than 500 attorneys across 17 offices in the U.S., Mexico, and beyond. The Phoenix office practices corporate and securities law, real estate, venture capital and private equity, energy infrastructure, construction, and complex litigation for clients ranging from emerging growth companies to established corporations. Recent work has included notable economic development transactions and venture financings, showing particular strength in mid-market and growth-stage deals. The firm has built its long-running reputation on full-service capability rather than a single specialty.",
     "google_place_id": null,
     "tier": "free",
     "practice_areas": ["business-law"]
@@ -21,6 +22,7 @@
     "website": "https://www.gtlaw.com",
     "logo_url": "/firms/greenberg-traurig.jpg",
     "bio_short": "International law firm whose Phoenix office handles commercial litigation, mergers and acquisitions, corporate finance, intellectual property, and real estate for businesses.",
+    "bio_long": "Greenberg Traurig's Phoenix office is part of an international firm that has opened 35 offices across the United States, plus additional locations abroad, giving local clients access to commercial litigation, securities, mergers and acquisitions, municipal and corporate finance, intellectual property, labor and employment, and real estate counsel backed by national resources. The office positions itself as a go-to firm for Phoenix businesses, emphasizing practical advice at the intersection of business and government. Its attorneys are regularly recognized by Best Lawyers in America, Chambers USA, and Southwest Super Lawyers, and many hold leadership roles in Phoenix civic organizations such as the Desert Botanical Garden and the Southwest Autism Research and Resource Center.",
     "google_place_id": null,
     "tier": "free",
     "practice_areas": ["business-law"]
@@ -34,6 +36,7 @@
     "website": "https://www.dickinson-wright.com",
     "logo_url": null,
     "bio_short": "Full-service firm with a large Phoenix office practicing corporate law, intellectual property, real estate, litigation, and related business matters.",
+    "bio_long": "Dickinson Wright opened its Phoenix office in 2009 as part of a firm with more than 550 lawyers across 22 offices in the United States and Canada, giving local clients access to roughly 40 practice areas. The Phoenix team handles corporate law, intellectual property, real estate, commercial litigation, construction, family law, and municipal finance, and its attorneys are recognized by Best Lawyers in America, Chambers USA, and Southwest Super Lawyers. The office is known for pairing large-firm resources with local community involvement: attorneys volunteer with groups including the Arizona State Parks Foundation and Legal Advocacy for Women in Shelters, and regularly contribute to local media and professional conferences.",
     "google_place_id": null,
     "tier": "free",
     "practice_areas": ["business-law"]
@@ -47,6 +50,7 @@
     "website": "https://www.knappandroberts.com",
     "logo_url": "/firms/knapp-roberts.jpg",
     "bio_short": "Plaintiffs' personal injury firm representing clients in catastrophic injury, wrongful death, medical malpractice, and vehicle accident cases.",
+    "bio_long": "Knapp & Roberts was founded by attorneys Craig A. Knapp and Dana R. Roberts and has spent more than 30 years in Phoenix representing plaintiffs exclusively in catastrophic personal injury and wrongful death cases, including medical malpractice, nursing home neglect, and birth injuries. The firm's confirmed case results include a 2009 verdict of $11 million against an assisted living facility, which the firm describes as the largest verdict ever awarded against an assisted living facility in the United States, and a 2004 Maricopa County jury verdict of $45.5 million in a wrongful death case involving a group home resident. Suzanne Ogden, a registered nurse who also holds a law degree, is part of the firm's team, bringing clinical nursing experience directly into case evaluation. The firm handles cases on contingency and charges no fee unless it wins.",
     "google_place_id": null,
     "tier": "free",
     "practice_areas": ["personal-injury"]
@@ -60,6 +64,7 @@
     "website": "https://1800theeagle.com",
     "logo_url": "/firms/goldberg-osborne.jpg",
     "bio_short": "Arizona personal injury firm handling car, truck, and motorcycle accidents, dog bites, birth injuries, and wrongful death claims.",
+    "bio_long": "Goldberg & Osborne was founded in 1989 and is known across Arizona by its 1-800-THE-EAGLE toll-free number. The firm has grown to 16 offices statewide, from Kingman to Sierra Vista, making it one of the largest plaintiffs' personal injury practices in Arizona. It represents clients in auto, motorcycle, and truck accidents, dog bites, birth injuries, nursing home abuse, and product liability cases, including Camp Lejeune water contamination claims. Beyond litigation, the firm helps coordinate medical care and negotiates directly with insurers on clients' behalf, and it offers 24-hour availability for new cases.",
     "google_place_id": null,
     "tier": "free",
     "practice_areas": ["personal-injury"]
@@ -73,6 +78,7 @@
     "website": "https://www.ramoslaw.com",
     "logo_url": "/firms/ramos-law.jpg",
     "bio_short": "Personal injury firm representing Arizona clients in vehicle crashes, slip-and-falls, brain and spine injuries, and wrongful death litigation.",
+    "bio_long": "Ramos Law was founded by Dr. Joseph Ramos, who is both a physician and a licensed attorney. That dual background lets the firm evaluate injuries directly, work with treating physicians, and build medically detailed cases involving auto accidents, brain and spine injuries, burns, and wrongful death claims. The firm has offices in Phoenix as well as Colorado, Oklahoma, and Wyoming, and says it prepares every case as though it will go to trial rather than pushing clients toward a quick settlement. This combination of clinical and legal expertise is central to how the firm distinguishes itself from firms that rely only on outside medical experts.",
     "google_place_id": null,
     "tier": "free",
     "practice_areas": ["personal-injury"]
@@ -86,6 +92,7 @@
     "website": "https://www.azfamilylawattorneys.com",
     "logo_url": "/firms/arizona-family-law-attorneys.jpg",
     "bio_short": "Phoenix family law firm handling divorce, child custody, child support, and related domestic relations matters.",
+    "bio_long": "Arizona Family Law Attorneys is led by attorney Shawnna Riggers and practices exclusively in family law, handling divorce, child custody and support, adoption, paternity, guardianship, spousal support, fathers' rights, and military divorce cases, with offices in Phoenix and Tempe. The firm has received an Avvo Choice award and BBB accreditation, and has been recognized among Best Divorce Lawyers in Phoenix listings. Because the firm takes on no work outside family law, its attorneys are able to focus solely on this area, and it offers flexible scheduling and credit-card payment plans to make representation more accessible.",
     "google_place_id": null,
     "tier": "free",
     "practice_areas": ["family-law"]
@@ -99,6 +106,7 @@
     "website": "https://www.bdblawfirm.com",
     "logo_url": "/firms/bishop-del-vecchio-beeks.jpg",
     "bio_short": "Phoenix divorce and family law firm representing clients in custody, support, property division, and spousal maintenance cases.",
+    "bio_long": "Bishop, Del Vecchio & Beeks practices exclusively in family law, handling divorce, child custody and support, domestic violence matters, prenuptial agreements, and restraining orders from offices in Phoenix and Tempe. Founding attorney William D. Bishop leads a firm that has been recognized in the Best Lawyers in America 2026 Edition and holds Martindale-Hubbell's AV Preeminent rating. The firm is notably direct about the fact that its recognitions come from peer and judicial review rather than paid directory listings.",
     "google_place_id": null,
     "tier": "free",
     "practice_areas": ["family-law"]
@@ -112,6 +120,7 @@
     "website": "https://thomaslawoffice.net",
     "logo_url": "/firms/thomas-law-office.jpg",
     "bio_short": "Phoenix family law practice focused on representing men and fathers in divorce, custody, support, and paternity matters.",
+    "bio_long": "Thomas Law Office was founded by attorney Ron Thomas in 1996 and focuses specifically on representing men and fathers in Arizona divorce, custody, child support, and paternity cases. Thomas built the firm around what he describes as a longstanding bias against fathers in family court outcomes, and says he will not hesitate to take a case to trial when a negotiated settlement would not serve his client. The practice intentionally keeps its caseload small, giving clients direct access to Thomas rather than routing them through paralegals or intake staff, and it offers virtual consultations for scheduling flexibility.",
     "google_place_id": null,
     "tier": "free",
     "practice_areas": ["family-law"]
@@ -125,6 +134,7 @@
     "website": "https://navalawaz.com",
     "logo_url": "/firms/nava-law-firm.jpg",
     "bio_short": "Phoenix criminal defense firm handling DUI cases including aggravated, extreme, and underage DUI alongside other felony and misdemeanor charges.",
+    "bio_long": "The Nava Law Firm was founded by Armando Nava, a cum laude graduate of Arizona State University's Sandra Day O'Connor College of Law who earned his JD in 2010. The firm has been recognized in the Best Lawyers in America directory for DUI/DWI Defense and Criminal Defense since 2025, and Nava was named to Super Lawyers' Rising Stars list from 2022 through 2024 and to The National Trial Lawyers' Top 40 Under 40. The firm handles the full range of Arizona criminal defense, from misdemeanors and DUI to serious felonies such as violent crimes and drug charges, building its approach around trial psychology, prosecutor negotiation tactics, and case-law research.",
     "google_place_id": null,
     "tier": "free",
     "practice_areas": ["dui"]
@@ -138,6 +148,7 @@
     "website": "https://jeremyhuss.com",
     "logo_url": "/firms/huss-law.jpg",
     "bio_short": "Phoenix criminal defense and DUI firm representing clients in DUI and other criminal cases across Arizona courts.",
+    "bio_long": "Huss Law was founded by Jeremy Huss, who spent 13 years as an Arizona felony prosecutor, trying more than 100 jury trials and training law enforcement statewide on DUI investigation and search-and-seizure procedure, before moving into criminal defense in 2016. That prosecutorial background shapes the firm's approach: Huss says he personally trained many of the officers whose traffic stops and field sobriety tests his firm now challenges in court. The Phoenix and Tempe firm handles DUI cases, including marijuana-DUI matters, along with domestic violence, drug crimes, assault, theft, and other felonies across Maricopa County.",
     "google_place_id": null,
     "tier": "free",
     "practice_areas": ["dui"]
@@ -151,6 +162,7 @@
     "website": "https://www.aaronblacklaw.com",
     "logo_url": "/firms/law-office-of-aaron-m-black.jpg",
     "bio_short": "Phoenix DUI defense firm handling extreme, super extreme, aggravated, and prescription-drug DUI charges and related criminal matters.",
+    "bio_long": "The Law Office of Aaron M. Black is a boutique Phoenix practice focused on DUI and criminal defense in Arizona's federal, state, and city courts. Aaron Black, licensed in Arizona since 2006, built his career after several years as a Deputy Public Defender in Maricopa County, where he defended clients facing serious felony charges, before opening his own practice. Super Lawyers has selected him every year from 2014 through 2026, and he holds Avvo's 10.0 Superb rating along with a top-1% distinction from the American Association of Premier DUI Attorneys.",
     "google_place_id": null,
     "tier": "free",
     "practice_areas": ["dui"]
@@ -164,6 +176,7 @@
     "website": "https://morrishall.com",
     "logo_url": "/firms/morris-hall.jpg",
     "bio_short": "An Arizona estate planning firm practicing since 1970, focused on wills, trusts, and probate administration.",
+    "bio_long": "Founded in 1970, Morris Hall is one of Arizona's longest-running estate planning firms, with nine offices spanning Phoenix, Scottsdale, Mesa, Chandler, Peoria, Prescott, Sedona, Flagstaff, and Carefree. Over more than five decades, the firm has created over 40,000 estate plans and settled more than 10,000 trusts and probate estates, representing billions of dollars in protected assets. As a member of the American Academy of Estate Planning Attorneys, Morris Hall focuses on wills, trusts, asset protection, and powers of attorney, and it supports clients with educational guides and webinars covering situations such as dying without a will or handling a small-estate probate.",
     "google_place_id": null,
     "tier": "free",
     "practice_areas": ["estate-planning"]
@@ -177,6 +190,7 @@
     "website": "https://www.p-rlaw.com",
     "logo_url": "/firms/pfarr-rethore.jpg",
     "bio_short": "A boutique Phoenix firm practicing estate planning, probate, and trust administration.",
+    "bio_long": "Pfarr & Rethore is a boutique Phoenix estate planning firm, currently led by attorneys Bernard M. Rethore and Alexander R. Hartman, with founding attorney John S. Pfarr now retired from active practice. The firm holds Martindale-Hubbell's AV Preeminent rating, and its attorneys belong to the Arizona Trial Lawyers Association, the State Bar of Arizona, and WealthCounsel, a national network focused on advanced estate planning techniques. Rather than treating estate planning as routine paperwork, the firm emphasizes making complex tax and succession strategy understandable for clients across Phoenix, Scottsdale, Paradise Valley, Tucson, and Flagstaff, including planning tied to charitable and philanthropic goals.",
     "google_place_id": null,
     "tier": "free",
     "practice_areas": ["estate-planning"]
@@ -190,6 +204,7 @@
     "website": "https://www.frgalaw.com",
     "logo_url": null,
     "bio_short": "A downtown Phoenix firm whose core practices include estate planning, probate and trust administration, and estate and tax controversy.",
+    "bio_long": "Frazer Ryan Goldberg & Arnold was founded in downtown Phoenix on September 1, 1989, by Jim Ryan, Dave Frazer, and Yale Goldberg, and has grown into a 24-lawyer firm led by 12 senior attorneys. The firm concentrates on estate planning, tax planning and tax controversy, estate and trust litigation, probate and trust administration, guardianships, and business law. The firm is particularly known for property tax reduction work and charitable planning strategies, and traces its client-first culture back to a founding philosophy, attributed to Jim Ryan, that clients care less about a lawyer's knowledge than about how much the lawyer genuinely cares.",
     "google_place_id": null,
     "tier": "free",
     "practice_areas": ["estate-planning"]
@@ -203,6 +218,7 @@
     "website": "https://abogadoray.com",
     "logo_url": "/firms/ybarra-maldonado-law-group.jpg",
     "bio_short": "A Phoenix firm handling immigration matters alongside criminal defense, personal injury, and civil rights cases, serving Spanish-speaking communities.",
+    "bio_long": "Ybarra Maldonado Law Group was founded by Ray A. Ybarra Maldonado, who describes the firm as socially conscious and built specifically to serve migrant and Spanish-speaking communities. With offices in Phoenix and Doral, Florida, the firm handles immigration matters, including deportation defense, family-based sponsorship, and asylum, alongside criminal defense, personal injury, and civil rights litigation.",
     "google_place_id": null,
     "tier": "free",
     "practice_areas": ["immigration"]
@@ -216,6 +232,7 @@
     "website": "https://habichlaw.com",
     "logo_url": "/firms/habich-law.jpg",
     "bio_short": "A Phoenix immigration firm handling family and employment-based immigration, citizenship, asylum, and waivers, with service in English, Spanish, and Persian.",
+    "bio_long": "Habich Law is a solo immigration practice led by Roya Habich, who earned her J.D. from the University of Wisconsin Law School in 2009, is licensed in Arizona and Wisconsin as well as the Federal District Court of Arizona, and practices in English, Spanish, and Persian. She has been rated among the Top 3 Immigration Lawyers in Phoenix by ThreeBestRated.com every year since 2016, and chaired the State Bar of Arizona's Immigration Law Section in 2015-2016. The firm handles the full range of immigration matters, including family and employment-based petitions, asylum, and citizenship applications.",
     "google_place_id": null,
     "tier": "free",
     "practice_areas": ["immigration"]
@@ -229,6 +246,7 @@
     "website": "https://www.vianeylaw.com",
     "logo_url": "/firms/vianey-k-hurtado-law.jpg",
     "bio_short": "A Phoenix firm focused on immigration and criminal defense, including family-based petitions, naturalization, and DACA matters.",
+    "bio_long": "Vianey K. Hurtado has practiced immigration law for roughly a decade and built her practice around the combined focus of immigration and criminal defense, a pairing that matters directly for clients whose immigration status is affected by a pending criminal charge. As the daughter of immigrants herself, she built a Spanish-speaking practice centered on family-based petitions, green card processing, naturalization, and relief programs including U visas, T visas, and DACA, serving both the Phoenix and Yuma areas. She has been featured in Forbes Advisor's guide to Phoenix immigration lawyers and is listed on Super Lawyers, and she received the Florence Project's Children's Pro Bono Attorney of the Year award in 2018.",
     "google_place_id": null,
     "tier": "free",
     "practice_areas": ["immigration"]

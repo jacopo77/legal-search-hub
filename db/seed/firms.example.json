@@ -1,6 +1,6 @@
 [
   {
-    "_comment": "Template for db/seed/firms.json. Copy this entry shape into firms.json and fill in real firms curated from the AZ State Bar directory (https://azbar.org). Delete this _comment key in the real file. Required: name, slug, city, phone, address, practice_areas. Slugs must be unique, kebab-case. city must match a cities.slug (phoenix at launch). tier defaults to 'free'; free tier gets exactly ONE practice area. google_place_id is set manually after matching the firm in Google Maps (T13 uses it for rating sync). logo_url is optional (null until an image is sourced) — expects a public/ path like /firms/<slug>.jpg, e.g. via scripts/fetch-streetview-images.js.",
+    "_comment": "Template for db/seed/firms.json. Copy this entry shape into firms.json and fill in real firms curated from the AZ State Bar directory (https://azbar.org). Delete this _comment key in the real file. Required: name, slug, city, phone, address, practice_areas. Slugs must be unique, kebab-case. city must match a cities.slug (phoenix at launch). tier defaults to 'free'; free tier gets exactly ONE practice area. google_place_id is set manually after matching the firm in Google Maps (T13 uses it for rating sync). logo_url is optional (null until an image is sourced) — expects a public/ path like /firms/<slug>.jpg, e.g. via scripts/fetch-streetview-images.js. bio_long is optional (null until researched/written) — a longer, substantive bio shown on any claimed firm's detail page, falling back to bio_short otherwise; every specific factual claim in it (dollar figures, founding years, named people, awards) should be verified against an authoritative source before it's added.",
     "name": "Example Law Group PLLC",
     "slug": "example-law-group",
     "city": "phoenix",
@@ -18,6 +18,7 @@
       "sun": "Closed"
     },
     "bio_short": "One to two sentences about the firm, shown on listing cards.",
+    "bio_long": null,
     "bar_number": "012345",
     "google_place_id": null,
     "tier": "free",

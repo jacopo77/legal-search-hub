@@ -8,6 +8,7 @@ import { GoogleRatingBadge } from "@/components/listings/google-rating-badge";
 import { LeadForm } from "@/components/firms/lead-form";
 import { FirmMap } from "@/components/firms/firm-map";
 import { LogoUploadForm } from "@/components/firms/logo-upload-form";
+import { BioEditForm } from "@/components/firms/bio-edit-form";
 import { Button, buttonVariants } from "@/components/ui/button";
 
 // Full firm profile (ARCHITECTURE.md §4.4). Public readers only ever see
@@ -102,8 +103,13 @@ export async function FirmDetail({
   const gallery = [...firm.firm_gallery_images].sort(
     (a, b) => a.sort_order - b.sort_order,
   );
-  // Premium-only long bio, falling back to the short one (§4.4).
-  const bio = (isPremium && firm.bio_long) || firm.bio_short;
+  // bio_long displays whenever present, regardless of claim status —
+  // content depth isn't gated by ownership. It can come from a claimed
+  // owner (free or premium) via BioEditForm/PremiumEditForm, or from
+  // curated/researched content seeded directly for an unclaimed listing.
+  // Editing bio_long is still restricted to claimed owners; this only
+  // governs what's displayed.
+  const bio = firm.bio_long || firm.bio_short;
 
   // Render-time scheme allowlist: owners can update their own row via
   // PostgREST (RLS), bypassing the signup schema's protocol check — so the
@@ -280,21 +286,25 @@ export async function FirmDetail({
             </section>
           )}
 
-          {/* Free-tier owner logo upload: available to ANY claimed firm,
-              not just premium — distinct from PremiumEditForm's own logo
-              section below, which premium owners already have. */}
+          {/* Free-tier owner logo + bio editing: available to ANY claimed
+              firm, not just premium — distinct from PremiumEditForm below,
+              which premium owners already have (and which still owns
+              practice areas + gallery, the fields that remain premium
+              -only). Two independent forms under one section heading. */}
           {isOwner && !isPremium && (
             <section
               aria-labelledby="thumbnail-heading"
               className="mt-10 rounded-xl border border-border bg-card p-6"
             >
               <h2 id="thumbnail-heading" className="text-lg font-semibold">
-                Listing photo
+                Listing photo & bio
               </h2>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Upload a logo or photo to show on your card and listing page.
+                Upload a logo or photo, and write a longer bio, to show on
+                your card and listing page.
               </p>
               <LogoUploadForm firmId={firm.id} initialLogoUrl={firm.logo_url} />
+              <BioEditForm firmId={firm.id} initialBioLong={firm.bio_long} />
             </section>
           )}
 
