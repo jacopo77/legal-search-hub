@@ -50,6 +50,12 @@ export function FreeListingCard({
           {firm.phone && (
             <p className="mt-1 text-sm font-medium text-navy">{firm.phone}</p>
           )}
+
+          {firm.bioShort && (
+            <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+              {firm.bioShort}
+            </p>
+          )}
         </div>
       </li>
     );
@@ -79,6 +85,12 @@ export function FreeListingCard({
 
           {firm.phone && (
             <p className="mt-1 text-sm font-medium text-navy">{firm.phone}</p>
+          )}
+
+          {firm.bioShort && (
+            <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+              {firm.bioShort}
+            </p>
           )}
 
           <span className="mt-3 block rounded-lg bg-amber-500/10 px-4 py-2 text-xl font-bold text-amber-500 transition-colors group-hover:bg-amber-500/20 group-hover:underline">

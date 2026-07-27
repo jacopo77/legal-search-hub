@@ -58,6 +58,12 @@ export function PremiumListingCard({
           <p className="mt-2 text-sm font-medium text-navy">{firm.phone}</p>
         )}
 
+        {firm.bioShort && (
+          <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">
+            {firm.bioShort}
+          </p>
+        )}
+
         <Link
           href={`/${citySlug}/firms/${firm.slug}`}
           className="mt-5 inline-flex w-full items-center justify-center rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary/85"

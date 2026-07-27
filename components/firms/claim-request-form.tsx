@@ -20,9 +20,14 @@ const errorClass = "mt-1 text-xs text-destructive";
 export function ClaimRequestForm({
   firmId,
   firmName,
+  initialMessage,
 }: {
   firmId: string;
   firmName: string;
+  // Pre-fills the message field — used by the "Go Premium" claim entry
+  // point to record premium interest alongside the claim itself, since the
+  // actual upgrade can't happen until an admin approves the claim.
+  initialMessage?: string;
 }) {
   const [submitted, setSubmitted] = useState(false);
   // Local mirror of the type field for conditional copy — watch() isn't
@@ -35,7 +40,7 @@ export function ClaimRequestForm({
     setError,
   } = useForm<ChangeRequestInput>({
     resolver: zodResolver(changeRequestSchema),
-    defaultValues: { type: "claim" },
+    defaultValues: { type: "claim", message: initialMessage ?? "" },
   });
   const typeField = register("type");
 

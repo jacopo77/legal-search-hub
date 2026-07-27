@@ -7,6 +7,7 @@ import { env } from "@/lib/env";
 import { GoogleRatingBadge } from "@/components/listings/google-rating-badge";
 import { LeadForm } from "@/components/firms/lead-form";
 import { FirmMap } from "@/components/firms/firm-map";
+import { LogoUploadForm } from "@/components/firms/logo-upload-form";
 import { Button, buttonVariants } from "@/components/ui/button";
 
 // Full firm profile (ARCHITECTURE.md §4.4). Public readers only ever see
@@ -156,20 +157,20 @@ export async function FirmDetail({
       {firm.owner_id === null && (
         <div className="mt-6 flex items-center justify-between gap-4">
           <Link
-            href="/list-your-firm?claim=true"
+            href={`/${citySlug}/firms/${firmSlug}/claim`}
             className="text-xs text-muted-foreground hover:text-foreground hover:underline"
           >
             Claim
           </Link>
           <div className="flex items-center gap-2">
             <Link
-              href="/list-your-firm?claim=true"
+              href={`/${citySlug}/firms/${firmSlug}/claim`}
               className={buttonVariants({ variant: "outline", size: "sm" })}
             >
               Claim This Listing
             </Link>
             <Link
-              href="/list-your-firm?claim=true&premium=true"
+              href={`/${citySlug}/firms/${firmSlug}/claim?premium=true`}
               className={buttonVariants({ size: "sm" })}
             >
               Go Premium →
@@ -279,6 +280,24 @@ export async function FirmDetail({
             </section>
           )}
 
+          {/* Free-tier owner logo upload: available to ANY claimed firm,
+              not just premium — distinct from PremiumEditForm's own logo
+              section below, which premium owners already have. */}
+          {isOwner && !isPremium && (
+            <section
+              aria-labelledby="thumbnail-heading"
+              className="mt-10 rounded-xl border border-border bg-card p-6"
+            >
+              <h2 id="thumbnail-heading" className="text-lg font-semibold">
+                Listing photo
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                Upload a logo or photo to show on your card and listing page.
+              </p>
+              <LogoUploadForm firmId={firm.id} initialLogoUrl={firm.logo_url} />
+            </section>
+          )}
+
           {/* Owner upgrade CTA (T18): only the signed-in owner of a live,
               free-tier listing sees this. Plain form POST → 303 to Stripe;
               the tier flips in the webhook (T19). */}
@@ -291,8 +310,8 @@ export async function FirmDetail({
                 Upgrade to Premium
               </h2>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Add your logo, a photo gallery, multiple practice areas, a
-                longer bio, and a contact form on this page.
+                Add a photo gallery, multiple practice areas, a longer bio,
+                and a contact form on this page.
               </p>
               <form action="/api/billing/checkout" method="POST" className="mt-4">
                 <input type="hidden" name="firmId" value={firm.id} />

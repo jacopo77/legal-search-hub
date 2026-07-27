@@ -1,7 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { premiumEditSchema } from "@/lib/schemas/premium-edit";
-import { env } from "@/lib/env";
+import {
+  sniffImageExtension,
+  publicUrl,
+  replaceFirmLogo,
+} from "@/lib/firms/logo-upload";
 
 // POST /api/listings/[id]/edit — premium profile editing (T20). Multipart
 // form: bio_long, practice-area set, logo file, gallery add/remove.
@@ -14,7 +18,6 @@ import { env } from "@/lib/env";
 // under a per-firm path prefix, and gallery removal deletes the Storage
 // object along with its row so removed photos don't linger in the bucket.
 
-const LOGO_MAX_BYTES = 2 * 1024 * 1024;
 const GALLERY_MAX_BYTES = 5 * 1024 * 1024;
 const GALLERY_MAX_IMAGES = 12;
 
@@ -24,31 +27,6 @@ type EditFirmRow = {
   owner_id: string | null;
   logo_url: string | null;
 };
-
-// Magic-byte sniffing: file.type is attacker-supplied, so the allowlist is
-// enforced against the actual bytes. Returns the extension to use, or null.
-async function sniffImageExtension(file: File): Promise<string | null> {
-  const b = new Uint8Array(await file.slice(0, 12).arrayBuffer());
-  if (b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff) return "jpg";
-  if (b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47)
-    return "png";
-  if (
-    b[0] === 0x52 && // R
-    b[1] === 0x49 && // I
-    b[2] === 0x46 && // F
-    b[3] === 0x46 && // F
-    b[8] === 0x57 && // W
-    b[9] === 0x45 && // E
-    b[10] === 0x42 && // B
-    b[11] === 0x50 // P
-  )
-    return "webp";
-  return null;
-}
-
-function publicUrl(bucket: string, path: string): string {
-  return `${env.supabase.url()}/storage/v1/object/public/${bucket}/${path}`;
-}
 
 export async function POST(
   request: Request,
@@ -138,40 +116,17 @@ export async function POST(
     return Response.json({ error: "Could not save — please try again" }, { status: 500 });
   }
 
-  // Logo upload (optional; replaces the current one).
+  // Logo upload (optional; replaces the current one). Shared with the
+  // free-tier logo-only route (/api/listings/[id]/logo) — logo isn't a
+  // premium-gated feature, only the fields above/below are.
   const logo = form.get("logo");
   if (logo instanceof File && logo.size > 0) {
-    const ext = await sniffImageExtension(logo);
-    if (!ext || logo.size > LOGO_MAX_BYTES) {
+    const result = await replaceFirmLogo(admin, firm, logo);
+    if (!result.ok) {
       return Response.json(
-        { error: "Logo must be a JPEG, PNG, or WebP under 2 MB" },
-        { status: 400 },
+        { error: `${result.error} — other changes were saved` },
+        { status: result.status },
       );
-    }
-    const path = `${firm.id}/logo-${crypto.randomUUID()}.${ext}`;
-    const { error: uploadError } = await admin.storage
-      .from("firm-logos")
-      .upload(path, logo, { contentType: logo.type });
-    if (uploadError) {
-      console.error("edit: logo upload failed", uploadError);
-      return Response.json({ error: "Logo upload failed — other changes were saved" }, { status: 500 });
-    }
-    const { error: logoError } = await admin
-      .from("firms")
-      .update({ logo_url: publicUrl("firm-logos", path) })
-      .eq("id", firm.id);
-    if (logoError) {
-      console.error("edit: logo_url update failed", logoError);
-    } else {
-      // Best-effort cleanup of the replaced object so logos don't
-      // accumulate in the bucket.
-      const prefix = publicUrl("firm-logos", "");
-      if (firm.logo_url?.startsWith(prefix)) {
-        const { error: removeError } = await admin.storage
-          .from("firm-logos")
-          .remove([firm.logo_url.slice(prefix.length)]);
-        if (removeError) console.error("edit: old logo removal failed", removeError);
-      }
     }
   }
 
