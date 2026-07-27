@@ -1,12 +1,13 @@
 [
   {
-    "_comment": "Template for db/seed/firms.json. Copy this entry shape into firms.json and fill in real firms curated from the AZ State Bar directory (https://azbar.org). Delete this _comment key in the real file. Required: name, slug, city, phone, address, practice_areas. Slugs must be unique, kebab-case. city must match a cities.slug (phoenix at launch). tier defaults to 'free'; free tier gets exactly ONE practice area. google_place_id is set manually after matching the firm in Google Maps (T13 uses it for rating sync).",
+    "_comment": "Template for db/seed/firms.json. Copy this entry shape into firms.json and fill in real firms curated from the AZ State Bar directory (https://azbar.org). Delete this _comment key in the real file. Required: name, slug, city, phone, address, practice_areas. Slugs must be unique, kebab-case. city must match a cities.slug (phoenix at launch). tier defaults to 'free'; free tier gets exactly ONE practice area. google_place_id is set manually after matching the firm in Google Maps (T13 uses it for rating sync). logo_url is optional (null until an image is sourced) — expects a public/ path like /firms/<slug>.jpg, e.g. via scripts/fetch-streetview-images.js.",
     "name": "Example Law Group PLLC",
     "slug": "example-law-group",
     "city": "phoenix",
     "phone": "(602) 555-0100",
     "address": "123 N Central Ave, Suite 400, Phoenix, AZ 85004",
     "website": "https://example.com",
+    "logo_url": null,
     "hours": {
       "mon": "9:00 AM–5:00 PM",
       "tue": "9:00 AM–5:00 PM",

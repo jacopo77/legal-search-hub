@@ -100,7 +100,14 @@ export async function POST(request: Request) {
 
       const { error } = await supabase
         .from("firms")
-        .update({ tier: "premium", stripe_subscription_id: subscriptionId })
+        .update({
+          tier: "premium",
+          stripe_subscription_id: subscriptionId,
+          // Keep the PREMIUM display badge in sync with billing by default
+          // (docs/DESIGN-BADGES.md) — an admin can still override it via
+          // /admin at any time; this only sets it on each fresh upgrade.
+          premium_badge: true,
+        })
         .eq("id", firmId);
       if (error) {
         console.error("webhooks/stripe: premium upgrade failed", error);
@@ -169,7 +176,11 @@ export async function POST(request: Request) {
       const subscription = event.data.object as Stripe.Subscription;
       const { data: reverted, error } = await supabase
         .from("firms")
-        .update({ tier: "free", stripe_subscription_id: null })
+        .update({
+          tier: "free",
+          stripe_subscription_id: null,
+          premium_badge: false,
+        })
         .eq("stripe_subscription_id", subscription.id)
         .select("id");
       if (error) {

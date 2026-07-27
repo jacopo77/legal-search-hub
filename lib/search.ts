@@ -16,7 +16,7 @@ import {
 type SearchFirmRow = Omit<FirmRow, "firm_practice_areas">;
 
 const FIRM_FIELDS =
-  "id, slug, name, tier, phone, address, bio_short, logo_url, google_rating, google_review_count";
+  "id, slug, name, tier, phone, address, bio_short, logo_url, google_rating, google_review_count, owner_id, claim_badge_hidden, premium_badge";
 
 // The RPC returns firms without the practice-area join; fetch the links for
 // the result set in one follow-up query and reattach.

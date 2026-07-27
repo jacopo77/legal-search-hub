@@ -140,6 +140,7 @@ async function seedFirms(cityIds, practiceAreaIds) {
       phone: firm.phone,
       address: firm.address,
       website: firm.website ?? null,
+      logo_url: firm.logo_url ?? null,
       hours: firm.hours ?? null,
       bio_short: firm.bio_short ?? null,
       bar_number: firm.bar_number ?? null,

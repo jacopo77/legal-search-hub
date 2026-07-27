@@ -1,20 +1,60 @@
-# Session Resume — 2026-07-25
+# Session Resume — 2026-07-27
 
-Where we stopped mid-launch (T26). Read this first when resuming.
+Read this first when resuming work on Legal Search Hub. (Folded in the old
+root-level `RESUME.md`, which had drifted out of sync with git history —
+this file is now the single resume doc.)
+
+## Daily startup prompt
+
+Paste this into the session right after launching `claude` in this repo:
+
+> Read CLAUDE.md and docs/TASKS.md, pick up from the next incomplete task,
+> and tell me where we are before starting anything new. Also check the
+> last git commit message to confirm what was most recently completed.
+
+## Model / session note
+
+This project can run Claude Code on Kimi K3 (Moonshot AI) via
+`.claude/settings.local.json` in this repo root — that file holds the live
+`ANTHROPIC_BASE_URL`/`ANTHROPIC_AUTH_TOKEN`/`ANTHROPIC_MODEL` env vars and is
+gitignored (holds a real API token). It only takes effect for a session
+launched with cwd inside this repo.
 
 ## Current state — what is DONE and verified
 
-- **26/26 v1 build tasks code-complete**; full pre-launch audit (security,
-  billing, rule compliance) done and merged (PR #5).
+- **26/26 v1 build tasks (T1–T26) code-complete**; full pre-launch audit
+  (security, billing, rule compliance) done and merged (PR #5).
 - **Production deploys green** on Vercel project `legal-search-hub` after
   fixing the silent build crash (root cause: `next/font/google` downloading
   fonts at build time — replaced with a system font stack; sitemap also made
   fully dynamic). Node pinned via `engines: >=20`.
-- **Redesign live**: brand palette (#3D87C0/#1E3A5F/#E53935), gavel logo
-  nav, full-viewport Phoenix skyline hero with city-parameterized copy
-  (migration 0005), red search button, white chips.
+- **Redesign live and iterated repeatedly** since the first pass:
+  - Brand palette (#3D87C0/#1E3A5F/#E53935), gavel logo nav, full-viewport
+    Phoenix skyline hero with city-parameterized copy (migration 0005), red
+    search button, white chips.
+  - Navbar logo went through several size/crop passes (rectangular crop,
+    scaled down, then enlarged again) to its current look.
+  - Footer went through several background/logo iterations, settling on a
+    navy background with white text and the cropped logo next to hours.
+  - Divorce practice-area chip added next to Family Law in the hero.
+  - Phoenix listings page redesigned: split into "Featured Listings"
+    (premium) and "All Firms," premium placeholder cards (dark navy SVG,
+    gavel icon, FEATURED badge), compact free cards with a dynamic SVG
+    placeholder and seeded shuffle for variety, always-visible "View All"
+    button.
+  - Firm detail pages gained embedded Google Maps + Street View (plain
+    iframe embed, after trying and dropping `@react-google-maps/api`).
+  - Firm detail header redesigned: removed the prominent amber "Unclaimed
+    listing" badge in favor of a discreet top-left "Claim" link plus
+    top-right "Claim This Listing" / "Go Premium" buttons; the old
+    "Is this your firm?" intake section was removed so pages read as
+    actively managed listings.
+  - `scripts/scrape-firm-images.js` (Supabase + node-html-parser + sharp)
+    scraped hero/office/logo images from each firm's own website for all 18
+    seeded firms into `public/firms/*.jpg`. Some results are just small
+    logos/banners and may need manual replacement.
 - **Migrations 0004 + 0005 applied** to the correct Supabase project
-  (`rxycqygjwuhzfwevmqdj`) — note: they were first run against the WRONG
+  (`rxycqygjwuhzfwevmqdj`) — note: they were first run against the wrong
   project; if anything DB-related 404s, suspect that again.
 - **18 real Phoenix firms seeded** (3 per practice area), verified live on
   `/phoenix`. Seed data in `db/seed/firms.json`.
@@ -28,25 +68,37 @@ Where we stopped mid-launch (T26). Read this first when resuming.
 - **research.legalsearchhub.com live** — the ai-legal-assistant research
   app moved there (A record → 76.76.21.21 at Hostinger, verified HTTP 200).
 - **Root domain assigned** to `legal-search-hub` in Vercel (force-moved
-  from ai-legal-assistant via CLI) — but NOT YET SERVING (see blocker).
+  from ai-legal-assistant via CLI) — but NOT YET SERVING (see blocker,
+  unconfirmed whether still open — verify before assuming).
 - **app.legalsearchhub.com deliberately untouched** (CNAME →
   whitelabel.ludicrous.cloud = SmartDirectoryAI white-label, kept alive
   until their 100-lead bonus lands, then SmartDirectoryAI is cancelled).
 
-## 🔴 BLOCKER — where we stopped
+## Uncommitted in the working tree (as of `b3ed964`)
 
-**legalsearchhub.com root still resolves to 104.236.53.124**
-(SmartDirectoryAI's DigitalOcean infra, serves a "Default Title" page).
-The Hostinger DNS zone will not let the user EDIT the existing `A @`
-record to change it to Vercel's IP `76.76.21.21`. The zone accepts new
-records (the `research` record was added fine) — the `@` record is locked,
-most likely because the domain is in Hostinger's "parked" state
+- `CLAUDE.md` has an uncommitted addition: **"Current work session — Badge
+  system & Admin dashboard."** This is a plan, not code in progress —
+  neither the `ClaimBadge`/`PremiumBadge` components nor the
+  `firms.is_premium`/`firms.is_active` columns exist yet. It's distinct from
+  the already-shipped T16 approve/reject moderation queue and from the
+  Phase-2 T30 directory-health dashboard in `docs/TASKS.md` — don't conflate
+  the three. Decide whether to commit this note and start building, or
+  discard it.
+
+## 🔴 BLOCKER — where we stopped (last confirmed state, re-verify on resume)
+
+**legalsearchhub.com root still resolved to 104.236.53.124**
+(SmartDirectoryAI's DigitalOcean infra, serves a "Default Title" page) as of
+the last DNS check. The Hostinger DNS zone would not let the user EDIT the
+existing `A @` record to change it to Vercel's IP `76.76.21.21`. The zone
+accepts new records (the `research` record was added fine) — the `@` record
+is locked, most likely because the domain is in Hostinger's "parked" state
 (nameservers are ns1/ns2.dns-parking.com).
 
 Note: having `@` and `research` both point to 76.76.21.21 is NOT a
 conflict — different names may share an IP. Only duplicate names conflict.
 
-## EXACT NEXT ACTION when resuming
+### Exact next action when resuming (if still blocked)
 
 1. In Hostinger (hPanel → Domains → legalsearchhub.com → DNS Zone), get
    rid of the locked `A @ → 104.236.53.124` record:

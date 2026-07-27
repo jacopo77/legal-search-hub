@@ -112,3 +112,26 @@ data (a `cities` row), never via a new template or a parallel codebase.
 - When a planning assumption in `docs/ARCHITECTURE.md` §10 turns out to be
   wrong once real product feedback comes in, update that section rather
   than silently diverging from it in code.
+
+## CLAIM / PREMIUM listing badges (built)
+
+Full design spec: `docs/DESIGN-BADGES.md`. Superseded the earlier draft of
+this note (which had the colors/shapes backwards — kept here only as
+history, see git blame if needed).
+
+- **CLAIM badge** (top-left of card image): red background `#E53935`,
+  white lettering, white border, chamfered corners. Shows when
+  `firms.owner_id IS NULL AND NOT claim_badge_hidden`. No click behavior
+  in v1 — visual status only.
+- **PREMIUM badge** (top-right of card image): navy background `#1E3A5F`,
+  gold lettering `#FBBF24`, same border/chamfer. Shows when
+  `firms.premium_badge = true`. Replaced the old amber "Featured" pill.
+- Both badges derive from existing/added columns rather than duplicating
+  state: CLAIM from `owner_id`, PREMIUM from the dedicated
+  `firms.premium_badge` flag (kept in sync by the Stripe webhook, with the
+  admin toggle as an override — not the same thing as `firms.tier`).
+- `firms.claim_badge_hidden` and `firms.premium_badge` (migration 0006) are
+  privileged columns — admin/service-role only, same as `status`/`tier`.
+- `/admin` has an "All listings" table (live/suspended firms) with three
+  toggles per row: listing on/off (`status`), CLAIM badge, PREMIUM badge —
+  same POST-form pattern as the T16 moderation queue, no client JS.

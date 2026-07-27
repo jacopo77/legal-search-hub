@@ -2,8 +2,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { Gavel } from "lucide-react";
 import type { ListingFirm } from "./types";
+import { StatusBadge } from "./status-badge";
 
-// Premium/featured firm card: elevated layout with Featured badge.
+// Premium/featured firm card: elevated layout. The PREMIUM status badge
+// (top-right of the image, see status-badge.tsx) replaces the old amber
+// "Featured" pill.
 export function PremiumListingCard({
   firm,
   citySlug,
@@ -12,14 +15,14 @@ export function PremiumListingCard({
   citySlug: string;
 }) {
   const primaryArea = firm.practiceAreas[0];
+  const showClaimBadge = firm.ownerId === null && !firm.claimBadgeHidden;
+  const showPremiumBadge = firm.premiumBadge;
 
   return (
     <li className="relative flex flex-col rounded-xl border border-border bg-card p-8 shadow-sm">
-      <span className="absolute right-4 top-4 rounded-full bg-amber-400 px-3 py-1 text-xs font-bold text-navy shadow">
-        Featured
-      </span>
-
-      <div className="flex h-32 w-full items-center justify-center rounded-lg bg-gray-100">
+      <div className="relative flex h-32 w-full items-center justify-center rounded-lg bg-gray-100">
+        {showClaimBadge && <StatusBadge variant="claim" />}
+        {showPremiumBadge && <StatusBadge variant="premium" />}
         {firm.logoUrl ? (
           <div className="relative h-28 w-full">
             <Image

@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { ListingFirm } from "./types";
 import { FirmLogoPlaceholder } from "./firm-logo-placeholder";
+import { StatusBadge } from "./status-badge";
 
 // Compact free-tier card: top logo/SVG placeholder area, then name, practice
 // area, and phone below.
@@ -13,12 +14,16 @@ export function FreeListingCard({
   citySlug: string;
 }) {
   const primaryArea = firm.practiceAreas[0];
+  const showClaimBadge = firm.ownerId === null && !firm.claimBadgeHidden;
+  const showPremiumBadge = firm.premiumBadge;
 
   // Firm has a real logo — standard card with name linking to detail page.
   if (firm.logoUrl) {
     return (
       <li className="flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-shadow hover:shadow-sm">
         <div className="relative aspect-[4/3] w-full bg-gray-100">
+          {showClaimBadge && <StatusBadge variant="claim" />}
+          {showPremiumBadge && <StatusBadge variant="premium" />}
           <Image
             src={firm.logoUrl}
             alt={`${firm.name} logo`}
@@ -58,6 +63,8 @@ export function FreeListingCard({
         className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-shadow hover:shadow-sm"
       >
         <div className="relative aspect-[4/3] w-full bg-gray-100">
+          {showClaimBadge && <StatusBadge variant="claim" />}
+          {showPremiumBadge && <StatusBadge variant="premium" />}
           <FirmLogoPlaceholder firmName={firm.name} practiceArea={primaryArea?.name} />
         </div>
 

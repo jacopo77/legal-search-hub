@@ -88,6 +88,7 @@ async function getFirms(cityId: string, tier: "premium" | "free") {
     .select(
       `id, slug, name, tier, phone, address, bio_short, logo_url,
        google_rating, google_review_count,
+       owner_id, claim_badge_hidden, premium_badge,
        firm_practice_areas(practice_areas(slug, name))`,
     )
     .eq("city_id", cityId)

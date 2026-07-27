@@ -30,6 +30,20 @@ type ChangeRequestRow = {
   firms: { name: string; slug: string } | null;
 };
 
+// All listings whose lifecycle has left moderation (live/suspended) — the
+// per-listing on/off + badge toggles (docs/DESIGN-BADGES.md). Pending/
+// rejected firms stay in the queue above; they don't need badge toggles
+// yet.
+type ListingRow = {
+  id: string;
+  name: string;
+  status: "live" | "suspended";
+  owner_id: string | null;
+  claim_badge_hidden: boolean;
+  premium_badge: boolean;
+  cities: { name: string } | null;
+};
+
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", {
     year: "numeric",
@@ -45,6 +59,7 @@ export async function ModerationQueue() {
   const [
     { data: pendingFirms, error: firmsError },
     { data: changeRequests, error: changeRequestsError },
+    { data: listings, error: listingsError },
   ] = await Promise.all([
     supabase
       .from("firms")
@@ -60,6 +75,13 @@ export async function ModerationQueue() {
       // that the HighLevel task fired — the request still needs review.
       .in("status", ["pending", "highlevel_synced"])
       .order("created_at"),
+    supabase
+      .from("firms")
+      .select(
+        "id, name, status, owner_id, claim_badge_hidden, premium_badge, cities(name)",
+      )
+      .in("status", ["live", "suspended"])
+      .order("name"),
   ]);
 
   if (firmsError)
@@ -69,9 +91,12 @@ export async function ModerationQueue() {
       "ModerationQueue: change requests query failed",
       changeRequestsError,
     );
+  if (listingsError)
+    console.error("ModerationQueue: listings query failed", listingsError);
 
   const firms = (pendingFirms ?? []) as unknown as PendingFirmRow[];
   const requests = (changeRequests ?? []) as unknown as ChangeRequestRow[];
+  const allListings = (listings ?? []) as unknown as ListingRow[];
 
   return (
     <div className="mx-auto max-w-6xl space-y-12 px-4 py-10">
@@ -197,6 +222,105 @@ export async function ModerationQueue() {
                     </td>
                   </tr>
                 ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      <section aria-labelledby="all-listings-heading">
+        <h2 id="all-listings-heading" className="text-lg font-semibold">
+          All listings ({allListings.length})
+        </h2>
+        {allListings.length === 0 ? (
+          <p className="text-muted-foreground mt-3 text-sm">
+            No live or suspended listings yet.
+          </p>
+        ) : (
+          <div className="border-border mt-3 overflow-x-auto rounded-xl border">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-muted/50 text-muted-foreground">
+                <tr>
+                  <th className="px-4 py-2 font-medium">Firm</th>
+                  <th className="px-4 py-2 font-medium">City</th>
+                  <th className="px-4 py-2 font-medium">Claimed</th>
+                  <th className="px-4 py-2 font-medium">Listing</th>
+                  <th className="px-4 py-2 font-medium">CLAIM badge</th>
+                  <th className="px-4 py-2 font-medium">PREMIUM badge</th>
+                </tr>
+              </thead>
+              <tbody>
+                {allListings.map((listing) => {
+                  const claimed = listing.owner_id !== null;
+                  return (
+                    <tr key={listing.id} className="border-border border-t">
+                      <td className="px-4 py-2 font-medium">{listing.name}</td>
+                      <td className="text-muted-foreground px-4 py-2">
+                        {listing.cities?.name ?? "—"}
+                      </td>
+                      <td className="text-muted-foreground px-4 py-2">
+                        {claimed ? "Yes" : "No"}
+                      </td>
+                      <td className="px-4 py-2">
+                        <form
+                          action={`/api/admin/firms/${listing.id}`}
+                          method="POST"
+                        >
+                          <input
+                            type="hidden"
+                            name="intent"
+                            value="toggle-listing"
+                          />
+                          <Button
+                            type="submit"
+                            size="sm"
+                            variant={
+                              listing.status === "live" ? "outline" : "destructive"
+                            }
+                          >
+                            {listing.status === "live" ? "On" : "Off"}
+                          </Button>
+                        </form>
+                      </td>
+                      <td className="px-4 py-2">
+                        {claimed ? (
+                          <span className="text-muted-foreground text-xs">
+                            — (claimed)
+                          </span>
+                        ) : (
+                          <form
+                            action={`/api/admin/firms/${listing.id}`}
+                            method="POST"
+                          >
+                            <input
+                              type="hidden"
+                              name="intent"
+                              value="toggle-claim-badge"
+                            />
+                            <Button type="submit" size="sm" variant="outline">
+                              {listing.claim_badge_hidden ? "Hidden" : "Showing"}
+                            </Button>
+                          </form>
+                        )}
+                      </td>
+                      <td className="px-4 py-2">
+                        <form
+                          action={`/api/admin/firms/${listing.id}`}
+                          method="POST"
+                        >
+                          <input
+                            type="hidden"
+                            name="intent"
+                            value="toggle-premium-badge"
+                          />
+                          <Button type="submit" size="sm" variant="outline">
+                            {listing.premium_badge ? "On" : "Off"}
+                          </Button>
+                        </form>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
