@@ -5,7 +5,6 @@ import { Globe, Phone, MapPin, BadgeCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { env } from "@/lib/env";
 import { GoogleRatingBadge } from "@/components/listings/google-rating-badge";
-import { ClaimRequestForm } from "@/components/firms/claim-request-form";
 import { LeadForm } from "@/components/firms/lead-form";
 import { FirmMap } from "@/components/firms/firm-map";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -154,7 +153,32 @@ export async function FirmDetail({
           Something went wrong starting checkout — please try again.
         </p>
       )}
-      <nav className="text-sm text-muted-foreground">
+      {firm.owner_id === null && (
+        <div className="mt-6 flex items-center justify-between gap-4">
+          <Link
+            href="/list-your-firm?claim=true"
+            className="text-xs text-muted-foreground hover:text-foreground hover:underline"
+          >
+            Claim
+          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/list-your-firm?claim=true"
+              className={buttonVariants({ variant: "outline", size: "sm" })}
+            >
+              Claim This Listing
+            </Link>
+            <Link
+              href="/list-your-firm?claim=true&premium=true"
+              className={buttonVariants({ size: "sm" })}
+            >
+              Go Premium →
+            </Link>
+          </div>
+        </div>
+      )}
+
+      <nav className="mt-6 text-sm text-muted-foreground">
         <Link href={`/${citySlug}`} className="hover:text-foreground hover:underline">
           {citySlug.charAt(0).toUpperCase() + citySlug.slice(1)} firms
         </Link>{" "}
@@ -183,11 +207,7 @@ export async function FirmDetail({
                     Premium
                   </span>
                 )}
-                {firm.owner_id === null ? (
-                  <span className="rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
-                    Unclaimed listing
-                  </span>
-                ) : (
+                {firm.owner_id !== null && (
                   <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
                     <BadgeCheck className="size-3" aria-hidden />
                     Verified
@@ -299,25 +319,6 @@ export async function FirmDetail({
               >
                 Edit premium profile
               </Link>
-            </section>
-          )}
-
-          {/* Claim/edit intake (T17): only on unclaimed listings
-              (owner_id null). */}
-          {firm.owner_id === null && (
-            <section
-              id="claim"
-              aria-labelledby="claim-heading"
-              className="mt-10 rounded-xl border border-dashed border-primary/40 bg-primary/5 p-6"
-            >
-              <h2 id="claim-heading" className="text-lg font-semibold">
-                Is this your firm?
-              </h2>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Claim this listing to update your info, or suggest an edit.
-                Every request is reviewed by our team before anything changes.
-              </p>
-              <ClaimRequestForm firmId={firm.id} firmName={firm.name} />
             </section>
           )}
         </div>
