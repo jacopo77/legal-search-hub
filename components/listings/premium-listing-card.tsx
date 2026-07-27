@@ -1,8 +1,8 @@
 import Link from "next/link";
-import Image from "next/image";
-import { Gavel } from "lucide-react";
 import type { ListingFirm } from "./types";
 import { StatusBadge } from "./status-badge";
+import { FirmLogoPlaceholder } from "./firm-logo-placeholder";
+import { ShimmerImage } from "@/components/ui/shimmer-image";
 
 // Premium/featured firm card: elevated layout. The PREMIUM status badge
 // (top-right of the image, see status-badge.tsx) replaces the old amber
@@ -25,7 +25,7 @@ export function PremiumListingCard({
         {showPremiumBadge && <StatusBadge variant="premium" />}
         {firm.logoUrl ? (
           <div className="relative h-28 w-full">
-            <Image
+            <ShimmerImage
               src={firm.logoUrl}
               alt={`${firm.name} logo`}
               fill
@@ -34,7 +34,7 @@ export function PremiumListingCard({
             />
           </div>
         ) : (
-          <Gavel className="size-12 text-muted-foreground/60" aria-hidden />
+          <FirmLogoPlaceholder firmName={firm.name} practiceArea={primaryArea?.name} />
         )}
       </div>
 

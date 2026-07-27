@@ -1,8 +1,8 @@
 import Link from "next/link";
-import Image from "next/image";
 import type { ListingFirm } from "./types";
 import { FirmLogoPlaceholder } from "./firm-logo-placeholder";
 import { StatusBadge } from "./status-badge";
+import { ShimmerImage } from "@/components/ui/shimmer-image";
 
 // Compact free-tier card: top logo/SVG placeholder area, then name, practice
 // area, and phone below.
@@ -24,7 +24,7 @@ export function FreeListingCard({
         <div className="relative aspect-[4/3] w-full bg-gray-100">
           {showClaimBadge && <StatusBadge variant="claim" />}
           {showPremiumBadge && <StatusBadge variant="premium" />}
-          <Image
+          <ShimmerImage
             src={firm.logoUrl}
             alt={`${firm.name} logo`}
             fill

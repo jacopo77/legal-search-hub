@@ -54,8 +54,10 @@ export async function CityPageContent({
           heroHeadline: city.hero_headline,
           heroSubtext: city.hero_subtext,
         }}
+        query={query}
+        activePracticeArea={practiceArea}
       />
-      <div className="mx-auto max-w-6xl space-y-12 px-4 py-12">
+      <div id="results" className="mx-auto max-w-6xl space-y-12 px-4 py-12">
         {isSearching ? (
           <SearchResults
             cityId={city.id}

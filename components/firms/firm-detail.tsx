@@ -10,6 +10,7 @@ import { FirmMap } from "@/components/firms/firm-map";
 import { LogoUploadForm } from "@/components/firms/logo-upload-form";
 import { BioEditForm } from "@/components/firms/bio-edit-form";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { ShimmerImage } from "@/components/ui/shimmer-image";
 
 // Full firm profile (ARCHITECTURE.md §4.4). Public readers only ever see
 // status='live' rows — that filter stays here in the query layer.
@@ -274,7 +275,7 @@ export async function FirmDetail({
                     key={image.id}
                     className="relative aspect-[4/3] overflow-hidden rounded-lg border border-border"
                   >
-                    <Image
+                    <ShimmerImage
                       src={image.image_url}
                       alt={`${firm.name} office photo`}
                       fill

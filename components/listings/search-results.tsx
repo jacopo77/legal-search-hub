@@ -35,9 +35,10 @@ export async function SearchResults({
     practiceAreaName = data?.name ?? practiceAreaSlug;
   }
 
+  const count = firms.length;
   const heading = query
-    ? `Results for “${query}”`
-    : `${practiceAreaName} firms`;
+    ? `${count} result${count === 1 ? "" : "s"} for “${query}”`
+    : `${count} ${practiceAreaName} firm${count === 1 ? "" : "s"}`;
 
   return (
     <section aria-labelledby="search-results-heading">
