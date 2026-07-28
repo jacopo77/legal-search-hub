@@ -142,7 +142,7 @@ export async function ListingSection({
             />
           ))}
           {Array.from({ length: placeholderCount }).map((_, i) => (
-            <PremiumPlaceholderCard key={`placeholder-${i}`} />
+            <PremiumPlaceholderCard key={`placeholder-${i}`} imageIndex={i} />
           ))}
         </ul>
       </section>
