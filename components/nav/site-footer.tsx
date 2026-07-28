@@ -1,23 +1,33 @@
+import Link from "next/link";
 import Image from "next/image";
 import { COMPANY_NAP } from "@/lib/config";
+import { createClient } from "@/lib/supabase/server";
 
-const DAY_LABELS = [
-  ["mon", "Monday"],
-  ["tue", "Tuesday"],
-  ["wed", "Wednesday"],
-  ["thu", "Thursday"],
-  ["fri", "Friday"],
-  ["sat", "Saturday"],
-  ["sun", "Sunday"],
-] as const;
+async function getPracticeAreas() {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("practice_areas")
+    .select("slug, name")
+    .order("sort_order", { ascending: true });
+  if (error) {
+    console.error("SiteFooter: practice_areas query failed", error);
+    return [];
+  }
+  return data ?? [];
+}
 
 // Sitewide footer. NAP comes from COMPANY_NAP only — never inline these
 // values (CLAUDE.md rule 3; T23 audits them against the Google Business
-// Profile verbatim).
-export function SiteFooter() {
+// Profile verbatim). Practice-area links point at "/" rather than a
+// hardcoded city slug — "/" already resolves through HOMEPAGE_MODE to
+// whichever city or national view is currently live (CLAUDE.md rule 2),
+// same pattern app/not-found.tsx uses.
+export async function SiteFooter() {
+  const practiceAreas = await getPracticeAreas();
+
   return (
     <footer className="border-t border-white/10 bg-[#1E3A5F]">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-10 text-white sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-10 text-white sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <p className="font-semibold text-white">{COMPANY_NAP.name}</p>
           <address className="mt-3 text-sm leading-6 not-italic text-white/80">
@@ -31,18 +41,52 @@ export function SiteFooter() {
             </a>
           </address>
         </div>
+
+        {practiceAreas.length > 0 && (
+          <div>
+            <p className="text-sm font-semibold text-white">Practice Areas</p>
+            <ul className="mt-3 space-y-1.5 text-sm text-white/80">
+              {practiceAreas.map((area) => (
+                <li key={area.slug}>
+                  <Link
+                    href={`/?practiceArea=${area.slug}`}
+                    className="hover:text-white hover:underline"
+                  >
+                    {area.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         <div>
-          <p className="text-sm font-semibold text-white">Hours</p>
-          <dl className="mt-3 space-y-1 text-sm text-white/80">
-            {DAY_LABELS.map(([key, label]) => (
-              <div key={key} className="flex justify-between gap-6">
-                <dt>{label}</dt>
-                <dd>{COMPANY_NAP.hours[key]}</dd>
-              </div>
-            ))}
-          </dl>
+          <p className="text-sm font-semibold text-white">Company</p>
+          <ul className="mt-3 space-y-1.5 text-sm text-white/80">
+            <li>
+              <Link href="/about" className="hover:text-white hover:underline">
+                About
+              </Link>
+            </li>
+            <li>
+              <Link href="/contact" className="hover:text-white hover:underline">
+                Contact
+              </Link>
+            </li>
+            <li>
+              <Link href="/privacy" className="hover:text-white hover:underline">
+                Privacy Policy
+              </Link>
+            </li>
+            <li>
+              <Link href="/terms" className="hover:text-white hover:underline">
+                Terms of Service
+              </Link>
+            </li>
+          </ul>
         </div>
-        <div className="flex items-center justify-center">
+
+        <div className="flex items-center justify-center lg:justify-end">
           <div className="relative h-[120px] w-[214px]">
             <Image
               src="/Untitled_design_cropped.png"

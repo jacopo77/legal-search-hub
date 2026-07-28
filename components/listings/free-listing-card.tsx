@@ -4,8 +4,14 @@ import { FirmLogoPlaceholder } from "./firm-logo-placeholder";
 import { StatusBadge } from "./status-badge";
 import { ShimmerImage } from "@/components/ui/shimmer-image";
 
-// Compact free-tier card: top logo/SVG placeholder area, then name, practice
-// area, and phone below.
+// Compact free-tier card: top logo/placeholder image area, then name,
+// practice area, phone, bio, and a View Profile CTA below. One structure
+// for every firm — only the image area differs (real photo vs the navy
+// FirmLogoPlaceholder) — so a firm's card never looks or behaves
+// differently just because it hasn't uploaded a logo yet. The name and
+// CTA always link to the firm's own detail page, never a generic signup
+// page, regardless of claim status (the claim/edit flow lives on that
+// detail page itself, signaled here by the CLAIM badge).
 export function FreeListingCard({
   firm,
   citySlug,
@@ -16,14 +22,14 @@ export function FreeListingCard({
   const primaryArea = firm.practiceAreas[0];
   const showClaimBadge = firm.ownerId === null && !firm.claimBadgeHidden;
   const showPremiumBadge = firm.premiumBadge;
+  const firmPath = `/${citySlug}/firms/${firm.slug}`;
 
-  // Firm has a real logo — standard card with name linking to detail page.
-  if (firm.logoUrl) {
-    return (
-      <li className="flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-shadow hover:shadow-sm">
-        <div className="relative aspect-[4/3] w-full bg-gray-100">
-          {showClaimBadge && <StatusBadge variant="claim" />}
-          {showPremiumBadge && <StatusBadge variant="premium" />}
+  return (
+    <li className="flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-shadow hover:shadow-sm">
+      <div className="relative aspect-[4/3] w-full bg-gray-100">
+        {showClaimBadge && <StatusBadge variant="claim" />}
+        {showPremiumBadge && <StatusBadge variant="premium" />}
+        {firm.logoUrl ? (
           <ShimmerImage
             src={firm.logoUrl}
             alt={`${firm.name} logo`}
@@ -31,73 +37,45 @@ export function FreeListingCard({
             className="object-contain p-2"
             sizes="(max-width: 640px) 100vw, 33vw"
           />
-        </div>
+        ) : (
+          <FirmLogoPlaceholder
+            firmName={firm.name}
+            practiceArea={primaryArea?.name}
+          />
+        )}
+      </div>
 
-        <div className="p-4">
-          <h3 className="font-semibold leading-tight">
-            <Link
-              href={`/${citySlug}/firms/${firm.slug}`}
-              className="text-foreground hover:text-primary hover:underline"
-            >
-              {firm.name}
-            </Link>
-          </h3>
-
-          {primaryArea && (
-            <p className="text-sm italic text-gray-500">{primaryArea.name}</p>
-          )}
-
-          {firm.phone && (
-            <p className="mt-1 text-sm font-medium text-navy">{firm.phone}</p>
-          )}
-
-          {firm.bioShort && (
-            <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
-              {firm.bioShort}
-            </p>
-          )}
-        </div>
-      </li>
-    );
-  }
-
-  // Placeholder card — entire surface links to /list-your-firm.
-  return (
-    <li>
-      <Link
-        href="/list-your-firm"
-        className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-shadow hover:shadow-sm"
-      >
-        <div className="relative aspect-[4/3] w-full bg-gray-100">
-          {showClaimBadge && <StatusBadge variant="claim" />}
-          {showPremiumBadge && <StatusBadge variant="premium" />}
-          <FirmLogoPlaceholder firmName={firm.name} practiceArea={primaryArea?.name} />
-        </div>
-
-        <div className="p-4">
-          <h3 className="font-semibold leading-tight text-foreground group-hover:text-primary group-hover:underline">
+      <div className="flex flex-1 flex-col p-4">
+        <h3 className="font-semibold leading-tight">
+          <Link
+            href={firmPath}
+            className="text-foreground hover:text-primary hover:underline"
+          >
             {firm.name}
-          </h3>
+          </Link>
+        </h3>
 
-          {primaryArea && (
-            <p className="text-sm italic text-gray-500">{primaryArea.name}</p>
-          )}
+        {primaryArea && (
+          <p className="text-sm italic text-gray-500">{primaryArea.name}</p>
+        )}
 
-          {firm.phone && (
-            <p className="mt-1 text-sm font-medium text-navy">{firm.phone}</p>
-          )}
+        {firm.phone && (
+          <p className="mt-1 text-sm font-medium text-navy">{firm.phone}</p>
+        )}
 
-          {firm.bioShort && (
-            <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
-              {firm.bioShort}
-            </p>
-          )}
+        {firm.bioShort && (
+          <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+            {firm.bioShort}
+          </p>
+        )}
 
-          <span className="mt-3 block rounded-lg bg-amber-500/10 px-4 py-2 text-xl font-bold text-amber-500 transition-colors group-hover:bg-amber-500/20 group-hover:underline">
-            Claim Your Profile →
-          </span>
-        </div>
-      </Link>
+        <Link
+          href={firmPath}
+          className="mt-auto inline-flex w-full items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary/85"
+        >
+          View Profile →
+        </Link>
+      </div>
     </li>
   );
 }

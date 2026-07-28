@@ -62,11 +62,18 @@ export async function Hero({
             : undefined
         }
       />
-      <div aria-hidden className="absolute inset-0 bg-black/35" />
+      {/* Scrim behind the text/search/chip block only — a radial gradient
+          centered on the content, not a flat overlay — so the photo stays
+          untouched at the edges/corners and only darkens where it needs to
+          for text contrast. */}
+      <div
+        aria-hidden
+        className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,rgba(0,0,0,0.55),transparent_70%)]"
+      />
 
       <div className="relative mx-auto w-full max-w-4xl px-4 py-20 text-center text-white">
         <h1
-          className="font-bold tracking-tight text-balance"
+          className="font-bold leading-tight tracking-tight text-balance"
           style={{ fontSize: "clamp(2.5rem, 6vw, 4rem)" }}
         >
           {headline}
