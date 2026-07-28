@@ -39,6 +39,20 @@ export type FirmRow = {
   }[];
 };
 
+// Stable partition, not a sort: firms with a real image keep their
+// existing relative order and come first as a block; firms without one
+// keep their existing relative order and come after, as a block. Used to
+// keep "All Firms" grids from visually alternating between real photos
+// and the navy/gavel placeholder card.
+export function partitionByImage(firms: ListingFirm[]): ListingFirm[] {
+  const withImage: ListingFirm[] = [];
+  const withoutImage: ListingFirm[] = [];
+  for (const firm of firms) {
+    (firm.logoUrl?.trim() ? withImage : withoutImage).push(firm);
+  }
+  return [...withImage, ...withoutImage];
+}
+
 export function mapFirmRow(row: FirmRow): ListingFirm {
   return {
     id: row.id,

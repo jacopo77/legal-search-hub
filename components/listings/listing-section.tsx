@@ -4,7 +4,12 @@ import { createClient } from "@/lib/supabase/server";
 import { PremiumListingCard } from "./premium-listing-card";
 import { PremiumPlaceholderCard } from "./premium-placeholder-card";
 import { FreeListingCard } from "./free-listing-card";
-import { mapFirmRow, type FirmRow, type ListingFirm } from "./types";
+import {
+  mapFirmRow,
+  partitionByImage,
+  type FirmRow,
+  type ListingFirm,
+} from "./types";
 
 // Seeded pseudo-random generator (LCG). Same seed → same sequence.
 function createSeededRandom(seed: string): () => number {
@@ -157,7 +162,9 @@ export async function ListingSection({
     (firm: ListingFirm) => firm.practiceAreas[0]?.name ?? "General",
     random,
   );
-  const preview = shuffled.slice(0, 6);
+  // Photo firms first (as a block), placeholder-card firms after — each
+  // block keeps the shuffle/variety order above untouched.
+  const preview = partitionByImage(shuffled).slice(0, 6);
 
   return (
     <section

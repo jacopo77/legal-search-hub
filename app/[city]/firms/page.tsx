@@ -2,7 +2,11 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { FreeListingCard } from "@/components/listings/free-listing-card";
-import { mapFirmRow, type FirmRow } from "@/components/listings/types";
+import {
+  mapFirmRow,
+  partitionByImage,
+  type FirmRow,
+} from "@/components/listings/types";
 
 async function getCity(slug: string) {
   const supabase = await createClient();
@@ -36,7 +40,10 @@ async function getFreeFirms(cityId: string) {
     console.error("AllFirmsPage: free firms query failed", error);
     return [];
   }
-  return (data as unknown as FirmRow[]).map(mapFirmRow);
+  // Photo firms first (as a block, alphabetical within it), placeholder
+  // -card firms after (also alphabetical within it) — the name order from
+  // the query above is preserved inside each block, not replaced.
+  return partitionByImage((data as unknown as FirmRow[]).map(mapFirmRow));
 }
 
 export async function generateMetadata({

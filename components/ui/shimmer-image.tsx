@@ -1,35 +1,24 @@
-"use client";
-
-import { useState } from "react";
 import Image, { type ImageProps } from "next/image";
 import { cn } from "@/lib/utils";
 
-// Wraps next/image with a pulsing skeleton overlay until the image
-// finishes loading, instead of a bare gray box that pops abruptly once the
-// lazy-loaded image arrives. onLoad requires a Client Component — Server
-// Components can't hold the loaded state.
+// Wraps next/image with a pulsing skeleton behind it, instead of a bare
+// gray box that pops abruptly once the lazy-loaded image arrives.
 //
-// The image itself is always rendered at full opacity from the start —
-// next/image's onLoad is known not to fire for images the browser already
-// has cached/decoded by mount time, so gating the image's own visibility
-// on that event risks leaving it permanently invisible. Instead the pulse
-// sits as an overlay on top (later in DOM order, same stacking context)
-// and disappears once loaded fires; if it never fires, the only defect is
-// a harmless lingering pulse over an already-visible image.
+// Deliberately has NO onLoad/loaded-state logic: next/image's onLoad does
+// not reliably fire in this app (verified empirically — images that load
+// successfully, confirmed via LCP and network logs, never triggered it),
+// so any approach that depends on that event to reveal or hide the image
+// risks getting stuck. Instead the pulse sits behind the image in plain
+// DOM/stacking order (rendered first, image second, both absolute-fill) —
+// once the image paints, its opaque pixels simply cover the pulse
+// underneath with no JS involved. If the image is still loading or fails,
+// the pulse remains visible through the gap. This is a Server Component;
+// no client state is needed.
 export function ShimmerImage({ className, alt, ...props }: ImageProps) {
-  const [loaded, setLoaded] = useState(false);
-
   return (
     <>
-      <Image
-        {...props}
-        alt={alt}
-        className={cn(className)}
-        onLoad={() => setLoaded(true)}
-      />
-      {!loaded && (
-        <div className="absolute inset-0 animate-pulse bg-gray-200" aria-hidden />
-      )}
+      <div className="absolute inset-0 animate-pulse bg-gray-200" aria-hidden />
+      <Image {...props} alt={alt} className={cn(className)} />
     </>
   );
 }
