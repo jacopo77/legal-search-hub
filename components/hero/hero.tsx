@@ -51,8 +51,7 @@ export async function Hero({
   return (
     <section className="relative flex min-h-[calc(100svh-4rem)] items-center overflow-hidden">
       {/* Full-bleed hero image from cities.hero_image_url (local public/
-          asset for Phoenix; other cities via their row). Decorative —
-          content stays readable via the fixed 0.35 black overlay. */}
+          asset for Phoenix; other cities via their row). Decorative. */}
       <div
         aria-hidden
         className="absolute inset-0 bg-cover bg-center"
@@ -61,14 +60,6 @@ export async function Hero({
             ? { backgroundImage: `url(${city.heroImageUrl})` }
             : undefined
         }
-      />
-      {/* Scrim behind the text/search/chip block only — a radial gradient
-          centered on the content, not a flat overlay — so the photo stays
-          untouched at the edges/corners and only darkens where it needs to
-          for text contrast. */}
-      <div
-        aria-hidden
-        className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,rgba(0,0,0,0.55),transparent_70%)]"
       />
 
       <div className="relative mx-auto w-full max-w-4xl px-4 py-20 text-center text-white">
