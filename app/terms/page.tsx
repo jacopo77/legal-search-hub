@@ -55,17 +55,18 @@ export default function TermsPage() {
       </Section>
 
       <Section heading="Premium Listings and Payment">
-        Firms may upgrade to a Premium listing for $29 per month, billed
-        automatically on a recurring monthly basis through our payment
-        processor, Stripe. Premium listings receive priority placement in our
-        Featured Listings section, an expanded profile supporting multiple
-        practice areas and a photo gallery, and a direct &quot;Contact This
-        Firm&quot; inquiry form. You may cancel your Premium subscription at
-        any time by contacting us using the information below; cancellation
-        takes effect at the end of the then-current monthly billing period,
-        and your listing will revert to a free listing at that time. You are
-        responsible for keeping your payment information current, and a
-        failed payment may result in your listing reverting to free status.
+        Firms may upgrade to a Premium listing for $29 per month, or $299 per
+        year when billed annually, through our payment processor, Stripe.
+        Premium listings receive priority placement in our Featured Listings
+        section, an expanded profile supporting multiple practice areas and a
+        photo gallery, and a direct &quot;Contact This Firm&quot; inquiry
+        form. You may cancel your Premium subscription at any time by
+        contacting us using the information below; cancellation takes effect
+        at the end of the then-current billing period — monthly or annual,
+        whichever plan you are subscribed to — and your listing will revert
+        to a free listing at that time. You are responsible for keeping your
+        payment information current, and a failed payment may result in your
+        listing reverting to free status.
       </Section>
 
       <Section heading="Refund Policy">

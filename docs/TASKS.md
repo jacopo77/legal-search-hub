@@ -223,6 +223,10 @@ monetization levers we don't have. Stripe-side: add an annual Price,
 trial support on Checkout, promotion codes; webhook already handles the
 events, verify trial/coupon edge cases.
 _Depends on: T19, T26 (live Stripe)._
+_Priority note (2026-07-29): `/terms` now publicly states the $299/yr
+annual price as an available option (at the user's direction), even
+though Stripe Checkout only offers the $29/mo Price today — this task
+should ship before that gap is noticed by a firm trying to pay annually._
 
 **T30. Admin directory-health dashboard**
 Their dashboard's listings counts (free/claimed/premium), Marketplace
@@ -263,3 +267,9 @@ so it's tracked, not forgotten:
   a later build.
 - **Automated bar-number verification** (e.g., an Arizona State Bar lookup
   API) — v1's `bar_number` field is self-attested and unverified.
+- **"Ultra Premium" tier with homepage slideshow placement** — a third tier
+  above Premium ($29/mo, $299/yr) that would rotate a firm's photo/branding
+  through a hero-area slideshow slot. Raised 2026-07-29 during the Premium
+  vs. Free comparison table work; needs its own pricing, a slideshow
+  component, and a `firms.tier` enum change (currently `free`/`premium`
+  only) before it's buildable.
