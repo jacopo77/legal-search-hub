@@ -37,7 +37,7 @@ export function PremiumPlaceholderCard({
           text stays readable regardless of the photo's own brightness. */}
       <div
         aria-hidden
-        className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/10"
+        className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/35 to-black/8"
       />
 
       <StatusBadge variant="premium" />
