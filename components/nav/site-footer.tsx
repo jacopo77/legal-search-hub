@@ -83,6 +83,14 @@ export async function SiteFooter() {
                 Terms of Service
               </Link>
             </li>
+            <li>
+              <Link
+                href="/disclaimer"
+                className="hover:text-white hover:underline"
+              >
+                Disclaimer
+              </Link>
+            </li>
           </ul>
         </div>
 
