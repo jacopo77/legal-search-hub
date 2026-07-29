@@ -7,7 +7,7 @@ import { ShimmerImage } from "@/components/ui/shimmer-image";
 const PREMIUM_PROMO_IMAGES = [
   "/premium/OIG3.jpg",
   "/premium/OIG4.jpg",
-  "/premium/OIG4.YV.jpg",
+  "/premium/premium3.jpg",
 ];
 
 // Placeholder card for an available premium/featured slot — shown only
