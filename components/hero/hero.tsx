@@ -61,6 +61,9 @@ export async function Hero({
             : undefined
         }
       />
+      {/* Uniform darkening for text readability — flat 30% black across the
+          whole image, no gradient/scrim. */}
+      <div aria-hidden className="absolute inset-0 bg-black/20" />
 
       <div className="relative mx-auto w-full max-w-4xl px-4 py-20 text-center text-white">
         <h1
