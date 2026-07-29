@@ -36,6 +36,11 @@ export const env = {
   highlevel: {
     apiKey: () => required("HIGHLEVEL_API_KEY"),
     locationId: () => required("HIGHLEVEL_LOCATION_ID"),
+    // Inbound-webhook trigger for the "List Your Firm" signup workflow —
+    // a plain pre-authorized POST URL, distinct from the apiKey/locationId
+    // pair above (those are for the authenticated contacts/opportunities
+    // REST API).
+    webhookUrl: () => required("HIGHLEVEL_WEBHOOK_URL"),
   },
   googlePlaces: {
     apiKey: () => required("GOOGLE_PLACES_API_KEY"),

@@ -59,25 +59,37 @@ export async function createOrUpdateContact(input: {
   phone?: string;
   tags?: string[];
 }): Promise<HighLevelResult<HighLevelContact>> {
-  const result = await request<{ contact: HighLevelContact }>(
-    "POST",
-    "/contacts/upsert",
-    {
-      locationId: env.highlevel.locationId(),
-      name: input.name,
-      email: input.email,
-      ...(input.phone ? { phone: input.phone } : {}),
-      ...(input.tags?.length ? { tags: input.tags } : {}),
-    },
-  );
-  if (!result.ok) return result;
-  // Validate the shape instead of casting blind: a 2xx without the expected
-  // wrapper would otherwise throw TypeError at the call site — which in the
-  // Stripe webhook becomes a 500 and a retry loop.
-  if (!result.data.contact?.id) {
-    return { ok: false, status: 200, error: "HighLevel returned no contact id" };
+  try {
+    const result = await request<{ contact: HighLevelContact }>(
+      "POST",
+      "/contacts/upsert",
+      {
+        locationId: env.highlevel.locationId(),
+        name: input.name,
+        email: input.email,
+        ...(input.phone ? { phone: input.phone } : {}),
+        ...(input.tags?.length ? { tags: input.tags } : {}),
+      },
+    );
+    if (!result.ok) return result;
+    // Validate the shape instead of casting blind: a 2xx without the
+    // expected wrapper would otherwise throw TypeError at the call site —
+    // which in the Stripe webhook becomes a 500 and a retry loop.
+    if (!result.data.contact?.id) {
+      return { ok: false, status: 200, error: "HighLevel returned no contact id" };
+    }
+    return { ok: true, data: result.data.contact };
+  } catch (err) {
+    // env.highlevel.locationId()/apiKey() throw on missing config — that
+    // read happens here, before request()'s own try/catch, so it must be
+    // caught at this level too or a misconfigured env crashes the caller
+    // (e.g. the whole "List Your Firm" signup) instead of just logging.
+    return {
+      ok: false,
+      status: 0,
+      error: err instanceof Error ? err.message : String(err),
+    };
   }
-  return { ok: true, data: result.data.contact };
 }
 
 // Checkout-completed trigger: the core revenue event — moves the firm's
@@ -90,26 +102,36 @@ export async function createOpportunity(input: {
   pipelineId?: string;
   stageId?: string;
 }): Promise<HighLevelResult<{ id: string }>> {
-  const result = await request<{ opportunity: { id: string } }>(
-    "POST",
-    "/opportunities/",
-    {
-      locationId: env.highlevel.locationId(),
-      contactId: input.contactId,
-      name: input.name,
-      ...(input.pipelineId ? { pipelineId: input.pipelineId } : {}),
-      ...(input.stageId ? { pipelineStageId: input.stageId } : {}),
-    },
-  );
-  if (!result.ok) return result;
-  if (!result.data.opportunity?.id) {
+  try {
+    const result = await request<{ opportunity: { id: string } }>(
+      "POST",
+      "/opportunities/",
+      {
+        locationId: env.highlevel.locationId(),
+        contactId: input.contactId,
+        name: input.name,
+        ...(input.pipelineId ? { pipelineId: input.pipelineId } : {}),
+        ...(input.stageId ? { pipelineStageId: input.stageId } : {}),
+      },
+    );
+    if (!result.ok) return result;
+    if (!result.data.opportunity?.id) {
+      return {
+        ok: false,
+        status: 200,
+        error: "HighLevel returned no opportunity id",
+      };
+    }
+    return { ok: true, data: result.data.opportunity };
+  } catch (err) {
+    // See createOrUpdateContact: env.highlevel.locationId() throws on
+    // missing config, before request()'s own try/catch runs.
     return {
       ok: false,
-      status: 200,
-      error: "HighLevel returned no opportunity id",
+      status: 0,
+      error: err instanceof Error ? err.message : String(err),
     };
   }
-  return { ok: true, data: result.data.opportunity };
 }
 
 // Claim/edit-request trigger: a tracked follow-up item for an admin on the
@@ -134,4 +156,42 @@ export async function createTask(input: {
     return { ok: false, status: 200, error: "HighLevel returned no task id" };
   }
   return { ok: true, data: result.data.task };
+}
+
+export type SignupWebhookPayload = {
+  firm_name: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  practice_area: string;
+  website: string;
+  your_name: string;
+};
+
+// "List Your Firm" signup — inbound-webhook workflow trigger, not the
+// contacts/opportunities REST API: a plain POST to a pre-authorized
+// absolute URL, so it doesn't go through request() (which targets BASE_URL
+// with the Bearer/Version headers those endpoints need). Same best-effort
+// contract as every other function here — never throws.
+export async function triggerSignupWebhook(
+  payload: SignupWebhookPayload,
+): Promise<HighLevelResult<null>> {
+  try {
+    const res = await fetch(env.highlevel.webhookUrl(), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      return { ok: false, status: res.status, error: await res.text() };
+    }
+    return { ok: true, data: null };
+  } catch (err) {
+    return {
+      ok: false,
+      status: 0,
+      error: err instanceof Error ? err.message : String(err),
+    };
+  }
 }

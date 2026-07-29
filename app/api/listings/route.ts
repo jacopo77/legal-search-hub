@@ -1,6 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { listingSignupSchema } from "@/lib/schemas/listing-signup";
-import { createOrUpdateContact } from "@/lib/highlevel";
+import { createOrUpdateContact, triggerSignupWebhook } from "@/lib/highlevel";
 
 // POST /api/listings — "List Your Firm" free signup (T14).
 //
@@ -42,13 +42,13 @@ export async function POST(request: Request) {
   const [{ data: city }, { data: practiceArea }] = await Promise.all([
     supabase
       .from("cities")
-      .select("id")
+      .select("id, name")
       .eq("id", input.cityId)
       .eq("status", "live")
       .maybeSingle(),
     supabase
       .from("practice_areas")
-      .select("id")
+      .select("id, name")
       .eq("id", input.practiceAreaId)
       .maybeSingle(),
   ]);
@@ -196,6 +196,23 @@ export async function POST(request: Request) {
   });
   if (!highlevel.ok) {
     console.error("listings: HighLevel sync failed", highlevel.error);
+  }
+
+  // "List Your Firm" webhook trigger (separate HighLevel workflow from the
+  // contact upsert above) — same best-effort rule: never blocks the
+  // response the submitter sees.
+  const webhook = await triggerSignupWebhook({
+    firm_name: input.firmName,
+    email,
+    phone: input.phone,
+    address: input.address,
+    city: city.name,
+    practice_area: practiceArea.name,
+    website: input.website || "",
+    your_name: input.ownerName,
+  });
+  if (!webhook.ok) {
+    console.error("listings: HighLevel signup webhook failed", webhook.error);
   }
 
   // Note: no isNewOwner in the response — it would enumerate which emails
