@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { StatusBadge } from "./status-badge";
 import { ShimmerImage } from "@/components/ui/shimmer-image";
+import { PremiumUpgradeModal } from "@/components/firms/premium-upgrade-modal";
 
 // Three curated building photos, cycled by index so multiple empty
 // premium slots on the same page don't repeat the same image.
@@ -49,12 +49,13 @@ export function PremiumPlaceholderCard({
         <p className="mt-1 text-sm text-white/85">
           Get premium visibility for your practice
         </p>
-        <Link
-          href="/list-your-firm#signup-form"
-          className="mt-4 inline-flex w-full items-center justify-center rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary/85"
-        >
-          Claim This Premium Spot →
-        </Link>
+        <PremiumUpgradeModal
+          claimHref="/list-your-firm#signup-form"
+          continueLabel="Continue to sign up your firm"
+          fineprint="List your firm free, then upgrade to Premium once you're signed in."
+          triggerLabel="Claim This Premium Spot →"
+          triggerClassName="mt-4 w-full px-4 py-3"
+        />
       </div>
     </li>
   );

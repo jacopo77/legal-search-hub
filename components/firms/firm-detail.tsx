@@ -200,12 +200,12 @@ export async function FirmDetail({
             >
               Claim This Listing
             </Link>
-            <Link
-              href={`/${citySlug}/firms/${firmSlug}/claim?premium=true`}
-              className={buttonVariants({ size: "sm" })}
-            >
-              Go Premium →
-            </Link>
+            <PremiumUpgradeModal
+              firmId={firm.id}
+              claimHref={`/${citySlug}/firms/${firmSlug}/claim?premium=true`}
+              triggerLabel="Go Premium →"
+              triggerSize="sm"
+            />
           </div>
         </div>
       )}

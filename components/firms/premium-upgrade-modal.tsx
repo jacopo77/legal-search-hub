@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 type BillingInterval = "monthly" | "annual";
 
@@ -29,7 +31,31 @@ const PRICE_CONFIG: Record<
   },
 };
 
-export function PremiumUpgradeModal({ firmId }: { firmId: string }) {
+export function PremiumUpgradeModal({
+  firmId,
+  claimHref,
+  continueLabel = "Continue to claim your listing",
+  fineprint = "Our team reviews every claim — billing starts once you're approved and signed in.",
+  triggerLabel = "Upgrade to Premium",
+  triggerSize = "default",
+  triggerClassName,
+}: {
+  // Required for the Stripe-checkout path (existing owner). Not needed when
+  // claimHref is set — there's no firm row yet for the no-firmId promo-card
+  // case (an empty premium slot with no real firm behind it).
+  firmId?: string;
+  // When set, the modal is informational only and "Continue" routes to
+  // claimHref instead of Stripe checkout — used both for an unclaimed
+  // existing firm (?premium=true on its claim form) and for the empty-slot
+  // promo card (the new-firm signup form), preserving the admin-approval
+  // gate in both cases.
+  claimHref?: string;
+  continueLabel?: string;
+  fineprint?: string;
+  triggerLabel?: string;
+  triggerSize?: "default" | "sm" | "lg";
+  triggerClassName?: string;
+}) {
   const [open, setOpen] = useState(false);
   const [interval, setInterval] = useState<BillingInterval>("monthly");
 
@@ -37,7 +63,13 @@ export function PremiumUpgradeModal({ firmId }: { firmId: string }) {
 
   return (
     <>
-      <Button onClick={() => setOpen(true)}>Upgrade to Premium</Button>
+      <Button
+        size={triggerSize}
+        className={triggerClassName}
+        onClick={() => setOpen(true)}
+      >
+        {triggerLabel}
+      </Button>
 
       {open && (
         <div
@@ -134,23 +166,41 @@ export function PremiumUpgradeModal({ firmId }: { firmId: string }) {
             </div>
 
             {/* CTA + fine print */}
-            <form
-              action="/api/billing/checkout"
-              method="POST"
-              className="border-t border-[#E5E0D8] bg-white p-8"
-            >
-              <input type="hidden" name="firmId" value={firmId} />
-              <input type="hidden" name="plan" value={interval} />
-              <Button
-                type="submit"
-                className="w-full bg-[#8B7355] text-white hover:bg-[#7A6548]"
+            {claimHref ? (
+              <div className="border-t border-[#E5E0D8] bg-white p-8">
+                <Link
+                  href={claimHref}
+                  className={cn(
+                    buttonVariants({
+                      className: "w-full bg-[#8B7355] text-white hover:bg-[#7A6548]",
+                    }),
+                  )}
+                >
+                  {continueLabel}
+                </Link>
+                <p className="mt-3 text-center text-xs text-[#888888]">
+                  {fineprint}
+                </p>
+              </div>
+            ) : (
+              <form
+                action="/api/billing/checkout"
+                method="POST"
+                className="border-t border-[#E5E0D8] bg-white p-8"
               >
-                Continue to listing details
-              </Button>
-              <p className="mt-3 text-center text-xs text-[#888888]">
-                Prorated automatically if you&apos;re upgrading mid-cycle.
-              </p>
-            </form>
+                <input type="hidden" name="firmId" value={firmId} />
+                <input type="hidden" name="plan" value={interval} />
+                <Button
+                  type="submit"
+                  className="w-full bg-[#8B7355] text-white hover:bg-[#7A6548]"
+                >
+                  Continue to listing details
+                </Button>
+                <p className="mt-3 text-center text-xs text-[#888888]">
+                  Prorated automatically if you&apos;re upgrading mid-cycle.
+                </p>
+              </form>
+            )}
           </div>
         </div>
       )}
