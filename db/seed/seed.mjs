@@ -63,7 +63,11 @@ const CITIES = [
   },
 ];
 
-// The 6 launch practice areas (ARCHITECTURE.md §4.2). Admin-extensible later.
+// The 6 launch practice areas (ARCHITECTURE.md §4.2), plus general-practice —
+// a catch-all for firms whose specialty isn't known (added when backfilling
+// generically-categorized scraped leads). Deliberately not in the homepage
+// hero's practice-area pills — see docs/DESIGN-BADGES.md-style reasoning:
+// it's a data-quality bucket, not a genuine specialty users search for.
 const PRACTICE_AREAS = [
   { slug: "family-law", name: "Family Law", sort_order: 1 },
   { slug: "divorce", name: "Divorce", sort_order: 2 },
@@ -72,6 +76,7 @@ const PRACTICE_AREAS = [
   { slug: "estate-planning", name: "Estate Planning", sort_order: 5 },
   { slug: "immigration", name: "Immigration", sort_order: 6 },
   { slug: "business-law", name: "Business Law", sort_order: 7 },
+  { slug: "general-practice", name: "General Law Practice", sort_order: 8 },
 ];
 
 async function upsertCities() {
