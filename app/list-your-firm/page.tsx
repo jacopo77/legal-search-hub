@@ -28,11 +28,14 @@ export default async function ListYourFirmPage() {
         Free listings put your firm in front of people actively searching for
         an attorney. Every submission is reviewed before it goes live.
       </p>
-      <div className="mt-8">
-        <SignupForm
-          cities={cities ?? []}
-          practiceAreas={practiceAreas ?? []}
-        />
+      <div id="signup-form" className="mt-12 scroll-mt-8">
+        <h2 className="text-xl font-semibold">Submit your listing</h2>
+        <div className="mt-4">
+          <SignupForm
+            cities={cities ?? []}
+            practiceAreas={practiceAreas ?? []}
+          />
+        </div>
       </div>
     </div>
   );

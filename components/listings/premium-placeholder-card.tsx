@@ -50,7 +50,7 @@ export function PremiumPlaceholderCard({
           Get premium visibility for your practice
         </p>
         <Link
-          href="/list-your-firm"
+          href="/list-your-firm#signup-form"
           className="mt-4 inline-flex w-full items-center justify-center rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary/85"
         >
           Claim This Premium Spot →

@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { bioEditSchema, type BioEditInput } from "@/lib/schemas/bio-edit";
 import { Button } from "@/components/ui/button";
+import { notifyError, notifySuccess } from "@/lib/toast";
 
 const inputClass =
   "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50 placeholder:text-muted-foreground";
@@ -42,12 +43,13 @@ export function BioEditForm({
     });
     const json = await res.json().catch(() => ({}));
     if (!res.ok) {
-      setError("root", {
-        message: json.error ?? "Something went wrong — please try again.",
-      });
+      const message = json.error ?? "Something went wrong — please try again.";
+      setError("root", { message });
+      notifyError(message, "Save failed");
       return;
     }
     setSaved(true);
+    notifySuccess("Your long bio is live on your listing.", "Bio saved");
   }
 
   return (

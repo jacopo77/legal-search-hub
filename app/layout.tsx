@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { SiteNav } from "@/components/nav/site-nav";
 import { SiteFooter } from "@/components/nav/site-footer";
+import { Toaster } from "@/components/ui/toaster";
 import { env } from "@/lib/env";
 import "./globals.css";
 
@@ -39,6 +40,7 @@ export default function RootLayout({
         {/* T24: pageview analytics — active only on Vercel deployments,
             no config needed. No firm-facing dashboard (PRD §5.4). */}
         <Analytics />
+        <Toaster />
       </body>
     </html>
   );

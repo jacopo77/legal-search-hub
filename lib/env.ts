@@ -32,6 +32,7 @@ export const env = {
     secretKey: () => required("STRIPE_SECRET_KEY"),
     webhookSecret: () => required("STRIPE_WEBHOOK_SECRET"),
     premiumPriceId: () => required("NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID"),
+    premiumAnnualPriceId: () => required("NEXT_PUBLIC_STRIPE_PREMIUM_ANNUAL_PRICE_ID"),
   },
   highlevel: {
     apiKey: () => required("HIGHLEVEL_API_KEY"),

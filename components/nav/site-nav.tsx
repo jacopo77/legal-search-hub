@@ -29,7 +29,7 @@ export async function SiteNav() {
           <div className="relative h-[90px] w-[161px]">
             <Image
               src="/Untitled_design_cropped.png"
-              alt=""
+              alt="Legal Search Hub"
               fill
               className="object-contain"
               priority

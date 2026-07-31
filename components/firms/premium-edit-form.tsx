@@ -11,6 +11,8 @@ import {
   type PremiumEditInput,
 } from "@/lib/schemas/premium-edit";
 import { Button } from "@/components/ui/button";
+import { LogoImageManager } from "@/components/firms/logo-image-manager";
+import { notifyError, notifySuccess } from "@/lib/toast";
 
 const inputClass =
   "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50 placeholder:text-muted-foreground";
@@ -33,6 +35,7 @@ type FormValues = PremiumEditInput & {
 // files appended from their inputs.
 export function PremiumEditForm({
   firmId,
+  firmName,
   firmPath,
   initialBioLong,
   initialLogoUrl,
@@ -41,6 +44,7 @@ export function PremiumEditForm({
   gallery,
 }: {
   firmId: string;
+  firmName: string;
   // e.g. /phoenix/firms/acme-law — for the "view listing" link.
   firmPath: string;
   initialBioLong: string | null;
@@ -50,9 +54,12 @@ export function PremiumEditForm({
   gallery: EditGalleryImage[];
 }) {
   const [saved, setSaved] = useState(false);
+  const [logoUrl, setLogoUrl] = useState(initialLogoUrl);
+  const [removingLogo, setRemovingLogo] = useState(false);
   const {
     register,
     handleSubmit,
+    resetField,
     formState: { errors, isSubmitting },
     setError,
   } = useForm<FormValues>({
@@ -87,12 +94,28 @@ export function PremiumEditForm({
     });
     const json = await res.json().catch(() => ({}));
     if (!res.ok) {
-      setError("root", {
-        message: json.error ?? "Something went wrong — please try again.",
-      });
+      const message = json.error ?? "Something went wrong — please try again.";
+      setError("root", { message });
+      notifyError(message);
       return;
     }
     setSaved(true);
+  }
+
+  // Immediate, standalone action — not bundled into the big multipart
+  // submit above — so confirming removal can't be silently lost if the
+  // owner later cancels an unrelated edit on this same form.
+  async function handleRemoveLogo() {
+    setRemovingLogo(true);
+    const res = await fetch(`/api/listings/${firmId}/logo`, { method: "DELETE" });
+    const json = await res.json().catch(() => ({}));
+    setRemovingLogo(false);
+    if (!res.ok) {
+      notifyError(json.error ?? "Something went wrong — please try again.", "Remove failed");
+      return;
+    }
+    setLogoUrl(null);
+    notifySuccess("Your logo was removed.", "Logo removed");
   }
 
   if (saved) {
@@ -118,25 +141,17 @@ export function PremiumEditForm({
         <h2 id="logo-heading" className={labelClass}>
           Logo
         </h2>
-        <div className="flex items-center gap-4">
-          {initialLogoUrl && (
-            <Image
-              src={initialLogoUrl}
-              alt="Current logo"
-              width={64}
-              height={64}
-              className="size-16 rounded-lg border border-border object-contain"
-            />
-          )}
-          <input
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            className="text-sm text-muted-foreground file:mr-3 file:rounded-lg file:border file:border-border file:bg-background file:px-3 file:py-2 file:text-sm file:font-medium hover:file:bg-muted"
-            {...register("logo")}
-          />
-        </div>
-        <p className="mt-1 text-xs text-muted-foreground">
-          JPEG, PNG, or WebP, under 2 MB. Uploading replaces the current logo.
+        <LogoImageManager
+          firmName={firmName}
+          logoUrl={logoUrl}
+          registerLogoInput={register("logo")}
+          onCancelSelection={() => resetField("logo")}
+          onRemove={handleRemoveLogo}
+          removing={removingLogo}
+        />
+        <p className="mt-2 text-xs text-muted-foreground">
+          A newly selected image is uploaded when you click &quot;Save
+          changes&quot; below.
         </p>
       </section>
 

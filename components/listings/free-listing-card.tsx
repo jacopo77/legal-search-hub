@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ListingFirm } from "./types";
 import { FirmLogoPlaceholder } from "./firm-logo-placeholder";
 import { StatusBadge } from "./status-badge";
+import { GoogleRatingBadge } from "./google-rating-badge";
 import { ShimmerImage } from "@/components/ui/shimmer-image";
 
 // Compact free-tier card: top logo/placeholder image area, then name,
@@ -58,6 +59,13 @@ export function FreeListingCard({
         {primaryArea && (
           <p className="text-sm italic text-gray-500">{primaryArea.name}</p>
         )}
+
+        <div className="mt-1">
+          <GoogleRatingBadge
+            rating={firm.googleRating}
+            reviewCount={firm.googleReviewCount}
+          />
+        </div>
 
         {firm.phone && (
           <p className="mt-1 text-sm font-medium text-navy">{firm.phone}</p>

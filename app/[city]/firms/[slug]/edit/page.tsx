@@ -95,6 +95,7 @@ export default async function EditFirmPage({
       <div className="mt-6">
         <PremiumEditForm
           firmId={firm.id}
+          firmName={firm.name}
           firmPath={firmPath}
           initialBioLong={firm.bio_long}
           initialLogoUrl={firm.logo_url}

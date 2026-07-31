@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { leadSchema, type LeadInput } from "@/lib/schemas/lead";
 import { Button } from "@/components/ui/button";
+import { notifyError } from "@/lib/toast";
 
 const inputClass =
   "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50 placeholder:text-muted-foreground";
@@ -41,9 +42,9 @@ export function LeadForm({
     });
     const body = await res.json().catch(() => ({}));
     if (!res.ok) {
-      setError("root", {
-        message: body.error ?? "Something went wrong — please try again.",
-      });
+      const message = body.error ?? "Something went wrong — please try again.";
+      setError("root", { message });
+      notifyError(message);
       return;
     }
     setSubmitted(true);

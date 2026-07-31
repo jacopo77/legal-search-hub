@@ -37,6 +37,27 @@ export type LogoUploadResult =
   | { ok: true; logoUrl: string }
   | { ok: false; error: string; status: number };
 
+export type LogoClearResult =
+  | { ok: true }
+  | { ok: false; error: string; status: number };
+
+// Best-effort cleanup of a firm-logos object, shared by replace and clear —
+// only removes URLs we recognize as our own bucket, never a foreign/legacy
+// value that happens to be stored in logo_url.
+async function removeStoredLogoIfOwned(
+  admin: SupabaseClient,
+  logoUrl: string | null,
+): Promise<void> {
+  const prefix = publicUrl("firm-logos", "");
+  if (!logoUrl?.startsWith(prefix)) return;
+  const { error } = await admin.storage
+    .from("firm-logos")
+    .remove([logoUrl.slice(prefix.length)]);
+  if (error) {
+    console.error("removeStoredLogoIfOwned: removal failed", error);
+  }
+}
+
 // Validates, uploads to the firm-logos bucket, updates firms.logo_url, and
 // best-effort removes the object it replaced.
 export async function replaceFirmLogo(
@@ -76,16 +97,32 @@ export async function replaceFirmLogo(
     };
   }
 
-  // Best-effort cleanup of the replaced object so logos don't accumulate.
-  const prefix = publicUrl("firm-logos", "");
-  if (firm.logo_url?.startsWith(prefix)) {
-    const { error: removeError } = await admin.storage
-      .from("firm-logos")
-      .remove([firm.logo_url.slice(prefix.length)]);
-    if (removeError) {
-      console.error("replaceFirmLogo: old logo removal failed", removeError);
-    }
-  }
+  await removeStoredLogoIfOwned(admin, firm.logo_url);
 
   return { ok: true, logoUrl };
+}
+
+// Clears logo_url and best-effort removes the Storage object — the
+// "Remove Image" action (image-manager UI). Firm falls back to the
+// navy/gavel FirmLogoPlaceholder on cards once logo_url is null.
+export async function clearFirmLogo(
+  admin: SupabaseClient,
+  firm: { id: string; logo_url: string | null },
+): Promise<LogoClearResult> {
+  const { error } = await admin
+    .from("firms")
+    .update({ logo_url: null })
+    .eq("id", firm.id);
+  if (error) {
+    console.error("clearFirmLogo: logo_url update failed", error);
+    return {
+      ok: false,
+      error: "Could not remove logo — please try again",
+      status: 500,
+    };
+  }
+
+  await removeStoredLogoIfOwned(admin, firm.logo_url);
+
+  return { ok: true };
 }

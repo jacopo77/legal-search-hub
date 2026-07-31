@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ListingFirm } from "./types";
 import { StatusBadge } from "./status-badge";
 import { FirmLogoPlaceholder } from "./firm-logo-placeholder";
+import { GoogleRatingBadge } from "./google-rating-badge";
 import { ShimmerImage } from "@/components/ui/shimmer-image";
 
 // Premium/featured firm card: elevated layout. The PREMIUM status badge
@@ -53,6 +54,13 @@ export function PremiumListingCard({
             {primaryArea.name}
           </span>
         )}
+
+        <div className="mt-2">
+          <GoogleRatingBadge
+            rating={firm.googleRating}
+            reviewCount={firm.googleReviewCount}
+          />
+        </div>
 
         {firm.phone && (
           <p className="mt-2 text-sm font-medium text-navy">{firm.phone}</p>

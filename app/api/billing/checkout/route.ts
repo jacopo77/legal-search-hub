@@ -25,7 +25,9 @@ type CheckoutFirmRow = {
 };
 
 export async function POST(request: Request) {
-  const firmId = (await request.formData()).get("firmId")?.toString();
+  const formData = await request.formData();
+  const firmId = formData.get("firmId")?.toString();
+  const plan = formData.get("plan")?.toString();
   const origin = new URL(request.url).origin;
 
   const supabase = await createClient();
@@ -64,6 +66,11 @@ export async function POST(request: Request) {
     return NextResponse.redirect(new URL(firmPath, origin), 303);
   }
 
+  const priceId =
+    plan === "annual"
+      ? env.stripe.premiumAnnualPriceId()
+      : env.stripe.premiumPriceId();
+
   // Reuse the owner's Stripe customer if a previous checkout created one
   // (ARCHITECTURE.md §6: billing identity lives on profiles, not firms).
   const { data: profile } = await admin
@@ -76,7 +83,7 @@ export async function POST(request: Request) {
   try {
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
-      line_items: [{ price: env.stripe.premiumPriceId(), quantity: 1 }],
+      line_items: [{ price: priceId, quantity: 1 }],
       // The webhook (T19) resolves the firm from this — don't rely on
       // metadata alone.
       client_reference_id: firm.id,

@@ -8,6 +8,7 @@ import {
   type ListingSignupInput,
 } from "@/lib/schemas/listing-signup";
 import { Button } from "@/components/ui/button";
+import { notifyError } from "@/lib/toast";
 
 export type SignupOption = { id: string; name: string };
 
@@ -46,9 +47,9 @@ export function SignupForm({
     });
     const body = await res.json().catch(() => ({}));
     if (!res.ok) {
-      setError("root", {
-        message: body.error ?? "Something went wrong — please try again.",
-      });
+      const message = body.error ?? "Something went wrong — please try again.";
+      setError("root", { message });
+      notifyError(message);
       return;
     }
     setSubmitted({ magicLinkSent: Boolean(body.magicLinkSent) });

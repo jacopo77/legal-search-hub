@@ -9,7 +9,8 @@ import { LeadForm } from "@/components/firms/lead-form";
 import { FirmMap } from "@/components/firms/firm-map";
 import { LogoUploadForm } from "@/components/firms/logo-upload-form";
 import { BioEditForm } from "@/components/firms/bio-edit-form";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { PremiumUpgradeModal } from "@/components/firms/premium-upgrade-modal";
+import { buttonVariants } from "@/components/ui/button";
 import { ShimmerImage } from "@/components/ui/shimmer-image";
 
 // Full firm profile (ARCHITECTURE.md §4.4). Public readers only ever see
@@ -37,6 +38,10 @@ type FirmDetailRow = {
   firm_gallery_images: { id: string; image_url: string; sort_order: number }[];
 };
 
+// city name/state are joined in for the JSON-LD PostalAddress below, not
+// for display — the page already gets the city label from the route slug.
+type FirmDetailWithCity = FirmDetailRow & { cityName: string; cityState: string };
+
 const DAY_LABELS = [
   ["mon", "Monday"],
   ["tue", "Tuesday"],
@@ -51,7 +56,7 @@ async function getFirm(citySlug: string, firmSlug: string) {
   const supabase = await createClient();
   const { data: city } = await supabase
     .from("cities")
-    .select("id, slug, status")
+    .select("id, slug, name, state, status")
     .eq("slug", citySlug)
     .maybeSingle();
   if (!city || city.status !== "live") return null;
@@ -73,7 +78,12 @@ async function getFirm(citySlug: string, firmSlug: string) {
     console.error(`FirmDetail: query failed for ${citySlug}/${firmSlug}`, error);
     return null;
   }
-  return data as unknown as FirmDetailRow | null;
+  if (!data) return null;
+  return {
+    ...(data as unknown as FirmDetailRow),
+    cityName: city.name,
+    cityState: city.state,
+  } satisfies FirmDetailWithCity;
 }
 
 export async function FirmDetail({
@@ -120,16 +130,30 @@ export async function FirmDetail({
 
   // JSON-LD structured data (T22): schema.org/Attorney (a LocalBusiness
   // subtype). Only fields the firm actually has are emitted; the rating
-  // comes from our cached Google values, never a live call.
+  // comes from our cached Google values, never a live call. `address` is
+  // structured as PostalAddress (streetAddress from the free-text column,
+  // addressLocality/addressRegion from the joined city row) rather than a
+  // plain string, since Google's rich-result parser wants the structured
+  // form. `image` isn't gated to premium — free-tier owners can upload a
+  // logo too (see logo-upload-form.tsx), so any firm with one gets it here.
   const jsonLd: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Attorney",
     name: firm.name,
     url: `${env.site.url()}/${citySlug}/firms/${firm.slug}`,
-    ...(firm.address ? { address: firm.address } : {}),
+    ...(firm.address
+      ? {
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: firm.address,
+            addressLocality: firm.cityName,
+            addressRegion: firm.cityState,
+          },
+        }
+      : {}),
     ...(firm.phone ? { telephone: firm.phone } : {}),
     ...(firm.website ? { sameAs: [firm.website] } : {}),
-    ...(isPremium && firm.logo_url ? { image: firm.logo_url } : {}),
+    ...(firm.logo_url ? { image: firm.logo_url } : {}),
     ...(firm.google_rating !== null && firm.google_review_count !== null
       ? {
           aggregateRating: {
@@ -270,14 +294,14 @@ export async function FirmDetail({
                 Photos
               </h2>
               <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {gallery.map((image) => (
+                {gallery.map((image, index) => (
                   <li
                     key={image.id}
                     className="relative aspect-[4/3] overflow-hidden rounded-lg border border-border"
                   >
                     <ShimmerImage
                       src={image.image_url}
-                      alt={`${firm.name} office photo`}
+                      alt={`${firm.name} office photo ${index + 1}`}
                       fill
                       className="object-cover"
                     />
@@ -304,14 +328,17 @@ export async function FirmDetail({
                 Upload a logo or photo, and write a longer bio, to show on
                 your card and listing page.
               </p>
-              <LogoUploadForm firmId={firm.id} initialLogoUrl={firm.logo_url} />
+              <LogoUploadForm
+                firmId={firm.id}
+                firmName={firm.name}
+                initialLogoUrl={firm.logo_url}
+              />
               <BioEditForm firmId={firm.id} initialBioLong={firm.bio_long} />
             </section>
           )}
 
           {/* Owner upgrade CTA (T18): only the signed-in owner of a live,
-              free-tier listing sees this. Plain form POST → 303 to Stripe;
-              the tier flips in the webhook (T19). */}
+              free-tier listing sees this. */}
           {isOwner && firm.tier === "free" && (
             <section
               aria-labelledby="upgrade-heading"
@@ -324,10 +351,9 @@ export async function FirmDetail({
                 Add a photo gallery, multiple practice areas, a longer bio,
                 and a contact form on this page.
               </p>
-              <form action="/api/billing/checkout" method="POST" className="mt-4">
-                <input type="hidden" name="firmId" value={firm.id} />
-                <Button type="submit">Upgrade to Premium</Button>
-              </form>
+              <div className="mt-4">
+                <PremiumUpgradeModal firmId={firm.id} />
+              </div>
             </section>
           )}
 
