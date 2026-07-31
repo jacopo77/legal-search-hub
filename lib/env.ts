@@ -9,6 +9,20 @@ function required(name: string): string {
   return value;
 }
 
+// Next.js only inlines NEXT_PUBLIC_* vars into Client Component bundles when
+// it can statically find a literal `process.env.NEXT_PUBLIC_X` expression at
+// the call site — `process.env[name]` with a variable (as `required` above
+// does) can't be statically analyzed, so it silently reads as undefined in
+// the browser even though the var is genuinely set. This wrapper takes the
+// already-read value so the static `process.env.NEXT_PUBLIC_X` reference
+// stays inline at each call site while still sharing one error message.
+function requiredPublic(name: string, value: string | undefined): string {
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
+  return value;
+}
+
 export const env = {
   site: {
     // Public origin used for absolute URLs (metadataBase, sitemap,
@@ -23,16 +37,29 @@ export const env = {
     },
   },
   supabase: {
-    url: () => required("NEXT_PUBLIC_SUPABASE_URL"),
-    anonKey: () => required("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
+    url: () =>
+      requiredPublic("NEXT_PUBLIC_SUPABASE_URL", process.env.NEXT_PUBLIC_SUPABASE_URL),
+    anonKey: () =>
+      requiredPublic(
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      ),
     // Server-only: bypasses RLS. Never import from a Client Component.
     serviceRoleKey: () => required("SUPABASE_SERVICE_ROLE_KEY"),
   },
   stripe: {
     secretKey: () => required("STRIPE_SECRET_KEY"),
     webhookSecret: () => required("STRIPE_WEBHOOK_SECRET"),
-    premiumPriceId: () => required("NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID"),
-    premiumAnnualPriceId: () => required("NEXT_PUBLIC_STRIPE_PREMIUM_ANNUAL_PRICE_ID"),
+    premiumPriceId: () =>
+      requiredPublic(
+        "NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID",
+        process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID,
+      ),
+    premiumAnnualPriceId: () =>
+      requiredPublic(
+        "NEXT_PUBLIC_STRIPE_PREMIUM_ANNUAL_PRICE_ID",
+        process.env.NEXT_PUBLIC_STRIPE_PREMIUM_ANNUAL_PRICE_ID,
+      ),
   },
   highlevel: {
     apiKey: () => required("HIGHLEVEL_API_KEY"),
