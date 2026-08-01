@@ -64,6 +64,21 @@ async function checkMetadata(address, apiKey) {
   return res.json();
 }
 
+// Genuine Street View car-captured imagery is always credited "© Google".
+// Anything else means the API served a user-contributed Photosphere tagged
+// to that address (a business/real-estate photo, sometimes an interior shot
+// with no relation to the building exterior) — confirmed by inspection:
+// frazer-ryan-goldberg-arnold.jpg turned out to be a wall and a vase,
+// credited "© Team Openhaus". Those are worse than no photo at all for a
+// trust-focused directory, so reject on copyright rather than trusting a
+// status:"OK" alone.
+function isGoogleCaptured(copyright) {
+  // Matches "© Google", "© Google, 2023", etc. — anchored at the start so
+  // "© Some Other Photographer" (a Photosphere credit) doesn't slip through
+  // just for mentioning Google somewhere else in the string.
+  return typeof copyright === "string" && /^©?\s*google\b/i.test(copyright.trim());
+}
+
 async function fetchImage(address, apiKey) {
   const url =
     `https://maps.googleapis.com/maps/api/streetview` +
@@ -158,6 +173,17 @@ async function main() {
         results.push({ firm, status: "unavailable", apiStatus: metadata.status });
         continue;
       }
+      if (!isGoogleCaptured(metadata.copyright)) {
+        console.log(
+          `${prefix}: rejected — not Google-captured imagery (credited "${metadata.copyright}", likely a user-contributed Photosphere, not a street-level building photo) — needs manual sourcing`,
+        );
+        results.push({
+          firm,
+          status: "rejected-non-google",
+          copyright: metadata.copyright,
+        });
+        continue;
+      }
 
       if (!apply) {
         const buffer = await fetchImage(firm.address, streetViewKey);
@@ -185,10 +211,18 @@ async function main() {
   console.log("\n--- Summary ---");
   const saved = results.filter((r) => r.status === "saved");
   const unavailable = results.filter((r) => r.status === "unavailable");
+  const rejected = results.filter((r) => r.status === "rejected-non-google");
   const errored = results.filter((r) => r.status === "error");
   console.log(`Saved:       ${saved.length}/${withAddress.length}`);
   console.log(`Unavailable: ${unavailable.length}/${withAddress.length}`);
+  console.log(`Rejected:    ${rejected.length}/${withAddress.length} (non-Google imagery)`);
   console.log(`Errors:      ${errored.length}/${withAddress.length}`);
+  if (rejected.length > 0) {
+    console.log("\nRejected (not Google-captured street imagery):");
+    for (const r of rejected) {
+      console.log(`  - ${r.firm.name} (${r.firm.slug}): "${r.copyright}"`);
+    }
+  }
 
   if (!apply) {
     console.log(
@@ -210,6 +244,31 @@ async function main() {
       console.log(`  ✗ ${r.firm.slug}: update failed — ${updateError.message}`);
     } else {
       console.log(`  ✓ ${r.firm.slug}: logo_url = ${logoUrl}`);
+    }
+  }
+
+  // Re-scan pass: a firm rejected this run may still carry a bad logo_url
+  // set by an earlier run of this same script (before the copyright check
+  // existed) — clear it back to null so FirmLogoPlaceholder renders instead,
+  // and remove the local file so it can't be picked up by mistake later.
+  const expectedLogoUrl = (slug) => `/firms/${slug}.jpg`;
+  const toRevert = rejected.filter(
+    (r) => r.firm.logo_url === expectedLogoUrl(r.firm.slug),
+  );
+  if (toRevert.length > 0) {
+    console.log("\nReverting previously-applied bad images...");
+    for (const r of toRevert) {
+      const { error: revertError } = await supabase
+        .from("firms")
+        .update({ logo_url: null })
+        .eq("id", r.firm.id);
+      if (revertError) {
+        console.log(`  ✗ ${r.firm.slug}: revert failed — ${revertError.message}`);
+        continue;
+      }
+      const localPath = path.join(PUBLIC_FIRMS_DIR, `${r.firm.slug}.jpg`);
+      if (fs.existsSync(localPath)) fs.unlinkSync(localPath);
+      console.log(`  ✓ ${r.firm.slug}: logo_url cleared, local file removed`);
     }
   }
 }
