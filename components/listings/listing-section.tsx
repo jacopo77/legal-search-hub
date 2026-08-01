@@ -1,9 +1,11 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Building2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { PremiumListingCard } from "./premium-listing-card";
 import { PremiumPlaceholderCard } from "./premium-placeholder-card";
 import { FreeListingCard } from "./free-listing-card";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   mapFirmRow,
   partitionByImage,
@@ -92,7 +94,7 @@ async function getFirms(cityId: string, tier: "premium" | "free") {
     .from("firms")
     .select(
       `id, slug, name, tier, phone, address, bio_short, logo_url,
-       google_rating, google_review_count,
+       google_rating, google_review_count, google_place_id,
        owner_id, claim_badge_hidden, premium_badge,
        firm_practice_areas(practice_areas(slug, name))`,
     )
@@ -133,7 +135,7 @@ export async function ListingSection({
       <section aria-labelledby="featured-listings-heading">
         <h2
           id="featured-listings-heading"
-          className="text-2xl font-bold tracking-tight text-navy"
+          className="font-heading text-3xl font-normal tracking-tight text-navy"
         >
           Featured Listings
         </h2>
@@ -173,19 +175,22 @@ export async function ListingSection({
     >
       <h2
         id="all-firms-heading"
-        className="text-2xl font-bold tracking-tight text-navy"
+        className="font-heading text-3xl font-normal tracking-tight text-navy"
       >
         All Firms
       </h2>
 
       {preview.length === 0 ? (
-        <p className="mt-6 rounded-xl border border-dashed border-border p-6 text-sm text-muted-foreground">
-          No firms are listed yet. Know a great firm — or run one?{" "}
-          <Link href="/list-your-firm" className="text-primary hover:underline">
-            List your firm
-          </Link>{" "}
-          to be the first.
-        </p>
+        <div className="mt-6 flex flex-col items-center gap-3 rounded-xl border border-dashed border-border p-10 text-center">
+          <Building2 className="size-8 text-muted-foreground/60" aria-hidden />
+          <p className="text-sm text-muted-foreground">
+            No firms are listed yet. Know a great firm — or run one?{" "}
+            <Link href="/list-your-firm" className="text-primary hover:underline">
+              List your firm
+            </Link>{" "}
+            to be the first.
+          </p>
+        </div>
       ) : (
         <>
           <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -197,7 +202,10 @@ export async function ListingSection({
           <div className="mt-8 text-center">
             <Link
               href={`/${citySlug}/firms`}
-              className="inline-flex items-center gap-2 rounded-lg border-2 border-navy px-5 py-2.5 text-sm font-semibold text-navy transition-colors hover:bg-navy hover:text-white"
+              className={cn(
+                buttonVariants({ variant: "outline-navy" }),
+                "gap-2 px-5 py-2.5 text-sm font-semibold",
+              )}
             >
               View All Firms
               <ArrowRight className="size-4" aria-hidden />

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SearchX } from "lucide-react";
 import { searchFirms, firmsByPracticeArea } from "@/lib/search";
 import { createClient } from "@/lib/supabase/server";
 import { PremiumListingCard } from "./premium-listing-card";
@@ -18,14 +19,17 @@ export async function SearchResults({
   query?: string;
   practiceAreaSlug?: string;
 }) {
+  // Search and the category chip now compose: a query narrows within the
+  // active practiceArea instead of one silently overriding the other.
   const firms = query
-    ? await searchFirms(cityId, query)
+    ? await searchFirms(cityId, query, practiceAreaSlug)
     : await firmsByPracticeArea(cityId, practiceAreaSlug ?? "");
 
-  // Resolve the practice area's display name for the heading when filtering
-  // by chip.
+  // Resolve the practice area's display name whenever the chip is active,
+  // not just in the no-query branch -- the heading and empty state both
+  // need it now that query + practiceArea can be active together.
   let practiceAreaName: string | null = null;
-  if (!query && practiceAreaSlug) {
+  if (practiceAreaSlug) {
     const supabase = await createClient();
     const { data } = await supabase
       .from("practice_areas")
@@ -37,7 +41,9 @@ export async function SearchResults({
 
   const count = firms.length;
   const heading = query
-    ? `${count} result${count === 1 ? "" : "s"} for “${query}”`
+    ? practiceAreaName
+      ? `${count} ${practiceAreaName} result${count === 1 ? "" : "s"} for "${query}"`
+      : `${count} result${count === 1 ? "" : "s"} for "${query}"`
     : `${count} ${practiceAreaName} firm${count === 1 ? "" : "s"}`;
 
   return (
@@ -55,10 +61,27 @@ export async function SearchResults({
       </div>
 
       {firms.length === 0 ? (
-        <p className="mt-4 rounded-xl border border-dashed border-border p-6 text-sm text-muted-foreground">
-          No firms match{query ? ` “${query}”` : ""} yet. Try a different
-          search, or browse all firms below.
-        </p>
+        <div className="mt-4 flex flex-col items-center gap-3 rounded-xl border border-dashed border-border p-10 text-center">
+          <SearchX className="size-8 text-muted-foreground/60" aria-hidden />
+          <p className="text-sm text-muted-foreground">
+            {query ? (
+              <>
+                No firms match &ldquo;{query}&rdquo;
+                {practiceAreaName ? ` in ${practiceAreaName}` : ""} yet. Try a
+                different search, or{" "}
+              </>
+            ) : (
+              <>No {practiceAreaName} firms are listed yet. </>
+            )}
+            <Link
+              href={`/${citySlug}/firms`}
+              className="text-primary hover:underline"
+            >
+              browse all firms
+            </Link>
+            .
+          </p>
+        </div>
       ) : (
         <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {firms.map((firm) =>

@@ -16,7 +16,7 @@ import {
 type SearchFirmRow = Omit<FirmRow, "firm_practice_areas">;
 
 const FIRM_FIELDS =
-  "id, slug, name, tier, phone, address, bio_short, logo_url, google_rating, google_review_count, owner_id, claim_badge_hidden, premium_badge";
+  "id, slug, name, tier, phone, address, bio_short, logo_url, google_rating, google_review_count, google_place_id, owner_id, claim_badge_hidden, premium_badge";
 
 // The RPC returns firms without the practice-area join; fetch the links for
 // the result set in one follow-up query and reattach.
@@ -56,6 +56,12 @@ async function attachPracticeAreas(
 export async function searchFirms(
   cityId: string,
   query: string,
+  // Optional: narrows text-search results to firms tagged with this
+  // practice area, so the search box and the category chip compose instead
+  // of the chip's selection being silently discarded. Applied in JS after
+  // the RPC rather than in SQL — the search_firms RPC has no practice-area
+  // parameter, and attachPracticeAreas already fetches the tags this needs.
+  practiceAreaSlug?: string,
 ): Promise<ListingFirm[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -65,7 +71,14 @@ export async function searchFirms(
     console.error("searchFirms: rpc failed", error);
     return [];
   }
-  return attachPracticeAreas((data ?? []) as unknown as SearchFirmRow[]);
+  const firms = await attachPracticeAreas(
+    (data ?? []) as unknown as SearchFirmRow[],
+  );
+  return practiceAreaSlug
+    ? firms.filter((firm) =>
+        firm.practiceAreas.some((area) => area.slug === practiceAreaSlug),
+      )
+    : firms;
 }
 
 export async function firmsByPracticeArea(
