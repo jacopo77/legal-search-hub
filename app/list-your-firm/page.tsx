@@ -18,7 +18,14 @@ export default async function ListYourFirmPage() {
       .select("id, name")
       .eq("status", "live")
       .order("sort_order"),
-    supabase.from("practice_areas").select("id, name").order("sort_order"),
+    // "general-practice" is an internal fallback bucket for generically-
+    // categorized leads, not a real specialty — excluded here so a new
+    // signup can't deliberately pick the catch-all instead of a real area.
+    supabase
+      .from("practice_areas")
+      .select("id, name")
+      .neq("slug", "general-practice")
+      .order("sort_order"),
   ]);
 
   return (

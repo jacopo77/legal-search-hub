@@ -40,7 +40,16 @@ export function SignInForm({ hasLinkError }: { hasLinkError: boolean }) {
     });
     setSubmitting(false);
     if (otpError) {
-      setError("Could not send the sign-in link — please try again.");
+      // Supabase returns 429/over_email_send_rate_limit on repeat requests
+      // for the same email (confirmed empirically — the second request
+      // within ~60s always 429s). The generic "try again" message is
+      // actively wrong advice here since an immediate retry just re-hits
+      // the same limit.
+      setError(
+        otpError.status === 429
+          ? "Too many attempts — please wait a few minutes before trying again."
+          : "Could not send the sign-in link — please try again.",
+      );
       return;
     }
     setSent(true);

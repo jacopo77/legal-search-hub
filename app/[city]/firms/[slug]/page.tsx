@@ -40,12 +40,24 @@ export async function generateMetadata({
 
   const { data: firm } = await supabase
     .from("firms")
-    .select("name, slug, bio_short")
+    .select("name, slug, bio_short, bio_long, owner_id, tier")
     .eq("city_id", city.id)
     .eq("slug", slug)
     .eq("status", "live")
     .maybeSingle();
   if (!firm) return {};
+
+  // Thin/unclaimed noindex: a listing is thin only when ALL three signals
+  // agree — never claimed, still free tier, and no bio at all. Any one of
+  // claim, premium upgrade, or a saved bio (BioEditForm/PremiumEditForm)
+  // flips this back to indexable automatically; no manual toggle. Deliberately
+  // AND, not OR — most seeded firms are unclaimed+free at launch, and an
+  // OR here would noindex the whole catalog rather than just the bare ones.
+  const isThin =
+    firm.owner_id === null &&
+    firm.tier === "free" &&
+    !firm.bio_short &&
+    !firm.bio_long;
 
   return {
     title: `${firm.name} — ${city.name}, ${city.state}`,
@@ -54,5 +66,6 @@ export async function generateMetadata({
       `${firm.name} is a law firm in ${city.name}, ${city.state}, listed on Legal Search Hub.`,
     alternates: { canonical: `/${citySlug}/firms/${firm.slug}` },
     openGraph: { title: firm.name },
+    ...(isThin ? { robots: { index: false, follow: true } } : {}),
   };
 }

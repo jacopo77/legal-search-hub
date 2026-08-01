@@ -91,7 +91,7 @@ export async function POST(request: Request) {
       ...(profile?.stripe_customer_id
         ? { customer: profile.stripe_customer_id as string }
         : { customer_email: user.email }),
-      success_url: `${origin}${firmPath}?checkout=success`,
+      success_url: `${origin}${firmPath}/edit?checkout=success`,
       cancel_url: `${origin}${firmPath}`,
     });
     if (!session.url) throw new Error("Stripe session missing url");
