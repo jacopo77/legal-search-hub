@@ -43,7 +43,7 @@ async function getFreeFirms(
 ) {
   const supabase = await createClient();
   const fields = `id, slug, name, tier, phone, address, bio_short, logo_url,
-       google_rating, google_review_count,
+       google_rating, google_review_count, google_place_id,
        owner_id, claim_badge_hidden, premium_badge`;
 
   // The practice-area filter needs an inner join to the link table so the

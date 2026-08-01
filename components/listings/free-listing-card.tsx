@@ -4,6 +4,8 @@ import { FirmLogoPlaceholder } from "./firm-logo-placeholder";
 import { StatusBadge } from "./status-badge";
 import { GoogleRatingBadge } from "./google-rating-badge";
 import { ShimmerImage } from "@/components/ui/shimmer-image";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 // Compact free-tier card: top logo/placeholder image area, then name,
 // practice area, phone, bio, and a View Profile CTA below. One structure
@@ -64,6 +66,7 @@ export function FreeListingCard({
           <GoogleRatingBadge
             rating={firm.googleRating}
             reviewCount={firm.googleReviewCount}
+            googlePlaceId={firm.googlePlaceId}
           />
         </div>
 
@@ -71,15 +74,24 @@ export function FreeListingCard({
           <p className="mt-1 text-sm font-medium text-navy">{firm.phone}</p>
         )}
 
-        {firm.bioShort && (
+        {firm.bioShort ? (
           <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
             {firm.bioShort}
           </p>
+        ) : (
+          firm.address && (
+            <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+              {firm.address}
+            </p>
+          )
         )}
 
         <Link
           href={firmPath}
-          className="mt-auto inline-flex w-full items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary/85"
+          className={cn(
+            buttonVariants({ variant: "outline-navy" }),
+            "mt-auto w-full px-4 py-2 text-sm font-semibold",
+          )}
         >
           View Profile →
         </Link>

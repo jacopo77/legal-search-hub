@@ -11,6 +11,7 @@ export type ListingFirm = {
   logoUrl: string | null;
   googleRating: number | null;
   googleReviewCount: number | null;
+  googlePlaceId: string | null;
   ownerId: string | null;
   claimBadgeHidden: boolean;
   premiumBadge: boolean;
@@ -31,6 +32,7 @@ export type FirmRow = {
   logo_url: string | null;
   google_rating: number | null;
   google_review_count: number | null;
+  google_place_id: string | null;
   owner_id: string | null;
   claim_badge_hidden: boolean;
   premium_badge: boolean;
@@ -65,6 +67,7 @@ export function mapFirmRow(row: FirmRow): ListingFirm {
     logoUrl: row.logo_url,
     googleRating: row.google_rating,
     googleReviewCount: row.google_review_count,
+    googlePlaceId: row.google_place_id,
     ownerId: row.owner_id,
     claimBadgeHidden: row.claim_badge_hidden,
     premiumBadge: row.premium_badge,

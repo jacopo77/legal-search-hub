@@ -4,6 +4,8 @@ import { StatusBadge } from "./status-badge";
 import { FirmLogoPlaceholder } from "./firm-logo-placeholder";
 import { GoogleRatingBadge } from "./google-rating-badge";
 import { ShimmerImage } from "@/components/ui/shimmer-image";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 // Premium/featured firm card: elevated layout. The PREMIUM status badge
 // (top-right of the image, see status-badge.tsx) replaces the old amber
@@ -59,6 +61,7 @@ export function PremiumListingCard({
           <GoogleRatingBadge
             rating={firm.googleRating}
             reviewCount={firm.googleReviewCount}
+            googlePlaceId={firm.googlePlaceId}
           />
         </div>
 
@@ -66,15 +69,24 @@ export function PremiumListingCard({
           <p className="mt-2 text-sm font-medium text-navy">{firm.phone}</p>
         )}
 
-        {firm.bioShort && (
+        {firm.bioShort ? (
           <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">
             {firm.bioShort}
           </p>
+        ) : (
+          firm.address && (
+            <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">
+              {firm.address}
+            </p>
+          )
         )}
 
         <Link
           href={`/${citySlug}/firms/${firm.slug}`}
-          className="mt-5 inline-flex w-full items-center justify-center rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary/85"
+          className={cn(
+            buttonVariants({ variant: "outline-navy" }),
+            "mt-5 w-full px-4 py-3 text-sm font-semibold",
+          )}
         >
           View Profile
         </Link>

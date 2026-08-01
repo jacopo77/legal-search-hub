@@ -7,12 +7,20 @@ import { Star } from "lucide-react";
 // still null — a muted "No rating yet" placeholder keeps card/detail
 // layouts consistent instead of silently collapsing that space, and reads
 // as "not synced yet," not "this firm has zero reviews."
+//
+// Clickable when a googlePlaceId is available (UX review): links out to the
+// place's own Google Maps page, where the actual reviews live — we only
+// ever cache the aggregate rating/count, never review text (rule 5), so
+// "read a review" has to leave the site. Falls back to plain (non-link)
+// text when no place id is on file, same as the no-rating state.
 export function GoogleRatingBadge({
   rating,
   reviewCount,
+  googlePlaceId,
 }: {
   rating: number | null;
   reviewCount: number | null;
+  googlePlaceId?: string | null;
 }) {
   if (rating === null) {
     return (
@@ -22,15 +30,32 @@ export function GoogleRatingBadge({
       </span>
     );
   }
-  return (
-    <span className="inline-flex items-center gap-1 text-sm font-medium text-foreground">
+  const content = (
+    <>
       <Star className="size-4 fill-amber-400 text-amber-400" aria-hidden />
       {rating.toFixed(1)}
       {reviewCount !== null && (
-        <span className="font-normal text-muted-foreground">
+        <span className="font-normal text-muted-foreground group-hover:underline">
           ({reviewCount.toLocaleString()} Google reviews)
         </span>
       )}
+    </>
+  );
+  if (googlePlaceId) {
+    return (
+      <a
+        href={`https://www.google.com/maps/place/?q=place_id:${googlePlaceId}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group inline-flex items-center gap-1 text-sm font-medium text-foreground hover:text-primary"
+      >
+        {content}
+      </a>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 text-sm font-medium text-foreground">
+      {content}
     </span>
   );
 }
