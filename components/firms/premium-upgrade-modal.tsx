@@ -82,7 +82,7 @@ export function PremiumUpgradeModal({
           <div className="absolute inset-0 bg-black/40" />
 
           {/* Modal */}
-          <div className="relative z-10 w-full max-w-[420px] overflow-hidden rounded-xl bg-[#FAF8F5] shadow-xl">
+          <div className="relative z-10 w-full max-w-[420px] overflow-hidden rounded-xl bg-white shadow-xl">
             {/* Close button */}
             <button
               type="button"
@@ -102,7 +102,7 @@ export function PremiumUpgradeModal({
 
             <div className="p-8 pb-6">
               <div className="flex flex-col gap-3">
-                <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#8B7355]">
+                <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-navy">
                   Premium Listing
                 </p>
                 <h2 className="font-serif text-[26px] font-normal leading-tight text-[#1a1a1a]">
@@ -115,13 +115,13 @@ export function PremiumUpgradeModal({
               </div>
 
               {/* Billing toggle */}
-              <div className="mt-6 flex items-center gap-1 rounded-lg border border-[#E5E0D8] bg-white p-1">
+              <div className="mt-6 flex items-center gap-1 rounded-lg border border-border bg-white p-1">
                 <button
                   type="button"
                   onClick={() => setInterval("monthly")}
                   className={`flex-1 rounded-md px-3 py-2 text-sm font-semibold transition-colors ${
                     interval === "monthly"
-                      ? "bg-[#1E3A5F] text-white shadow-sm"
+                      ? "bg-navy text-white shadow-sm"
                       : "text-[#666666] hover:text-[#1a1a1a]"
                   }`}
                 >
@@ -132,13 +132,13 @@ export function PremiumUpgradeModal({
                   onClick={() => setInterval("annual")}
                   className={`flex-1 rounded-md px-3 py-2 text-sm font-semibold transition-colors ${
                     interval === "annual"
-                      ? "bg-[#1E3A5F] text-white shadow-sm"
+                      ? "bg-navy text-white shadow-sm"
                       : "text-[#666666] hover:text-[#1a1a1a]"
                   }`}
                 >
                   Annual
                 </button>
-                <span className="mr-2 rounded-full bg-[#F5E6C8] px-2.5 py-0.5 text-xs font-bold text-[#8B7355]">
+                <span className="mr-2 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-bold text-primary">
                   Save 14%
                 </span>
               </div>
@@ -158,7 +158,7 @@ export function PremiumUpgradeModal({
               <ul className="mt-6 space-y-3">
                 {BENEFITS.map((benefit) => (
                   <li key={benefit} className="flex items-start gap-3 text-sm text-[#444444]">
-                    <span className="mt-0.5 shrink-0 text-[#8B7355]">&#10003;</span>
+                    <span className="mt-0.5 shrink-0 text-primary">&#10003;</span>
                     <span className="leading-5">{benefit}</span>
                   </li>
                 ))}
@@ -167,14 +167,10 @@ export function PremiumUpgradeModal({
 
             {/* CTA + fine print */}
             {claimHref ? (
-              <div className="border-t border-[#E5E0D8] bg-white p-8">
+              <div className="border-t border-border bg-white p-8">
                 <Link
                   href={claimHref}
-                  className={cn(
-                    buttonVariants({
-                      className: "w-full bg-[#8B7355] text-white hover:bg-[#7A6548]",
-                    }),
-                  )}
+                  className={cn(buttonVariants({ className: "w-full" }))}
                 >
                   {continueLabel}
                 </Link>
@@ -186,15 +182,12 @@ export function PremiumUpgradeModal({
               <form
                 action="/api/billing/checkout"
                 method="POST"
-                className="border-t border-[#E5E0D8] bg-white p-8"
+                className="border-t border-border bg-white p-8"
               >
                 <input type="hidden" name="firmId" value={firmId} />
                 <input type="hidden" name="plan" value={interval} />
-                <Button
-                  type="submit"
-                  className="w-full bg-[#8B7355] text-white hover:bg-[#7A6548]"
-                >
-                  Continue to listing details
+                <Button type="submit" className="w-full">
+                  Continue to payment
                 </Button>
                 <p className="mt-3 text-center text-xs text-[#888888]">
                   Prorated automatically if you&apos;re upgrading mid-cycle.

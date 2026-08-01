@@ -45,7 +45,7 @@ export default function NotFound() {
         />
         <button
           type="submit"
-          className="rounded-lg bg-brand-red px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-red/85"
+          className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/80 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-navy focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
         >
           Search
         </button>

@@ -47,6 +47,7 @@ export async function CityPageContent({
     <>
       <Hero
         city={{
+          id: city.id,
           slug: city.slug,
           name: city.name,
           state: city.state,

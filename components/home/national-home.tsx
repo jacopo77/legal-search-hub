@@ -49,7 +49,7 @@ export async function NationalHome() {
         <form
           action={`/${searchTarget.slug}`}
           role="search"
-          className="mx-auto mt-8 flex max-w-xl items-center gap-2 rounded-xl border border-border bg-card p-2 shadow-sm"
+          className="mx-auto mt-8 flex max-w-xl items-center gap-2 rounded-xl border border-border bg-card p-2 shadow-sm focus-within:border-navy focus-within:ring-3 focus-within:ring-navy/20"
         >
           <Search
             className="ml-2 size-5 shrink-0 text-muted-foreground"
@@ -67,7 +67,7 @@ export async function NationalHome() {
           />
           <button
             type="submit"
-            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80"
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-navy focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
           >
             Search
           </button>

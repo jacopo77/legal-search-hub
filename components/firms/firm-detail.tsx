@@ -12,6 +12,7 @@ import { BioEditForm } from "@/components/firms/bio-edit-form";
 import { PremiumUpgradeModal } from "@/components/firms/premium-upgrade-modal";
 import { buttonVariants } from "@/components/ui/button";
 import { ShimmerImage } from "@/components/ui/shimmer-image";
+import { cn } from "@/lib/utils";
 
 // Full firm profile (ARCHITECTURE.md §4.4). Public readers only ever see
 // status='live' rows — that filter stays here in the query layer.
@@ -32,6 +33,7 @@ type FirmDetailRow = {
   bar_number: string | null;
   google_rating: number | null;
   google_review_count: number | null;
+  google_place_id: string | null;
   firm_practice_areas: {
     practice_areas: { slug: string; name: string } | null;
   }[];
@@ -66,7 +68,7 @@ async function getFirm(citySlug: string, firmSlug: string) {
     .select(
       `id, slug, name, tier, owner_id, phone, address, website, hours,
        bio_short, bio_long, logo_url, bar_number,
-       google_rating, google_review_count,
+       google_rating, google_review_count, google_place_id,
        firm_practice_areas(practice_areas(slug, name)),
        firm_gallery_images(id, image_url, sort_order)`,
     )
@@ -121,6 +123,28 @@ export async function FirmDetail({
   // Editing bio_long is still restricted to claimed owners; this only
   // governs what's displayed.
   const bio = firm.bio_long || firm.bio_short;
+
+  // New intermediate heading tier (UX review 2026-07-31): a real step
+  // between the h1 and body text so sparse listings — no bio, no gallery —
+  // don't collapse to one type size. Practice areas plus city/state always
+  // gives at least the location half, even for firms with no tagged areas.
+  const tagline = [
+    practiceAreas.length > 0
+      ? practiceAreas.map((a) => a.name).join(", ")
+      : null,
+    `${firm.cityName}, ${firm.cityState}`,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
+  // Sparse-page layout (UX review): the two-column grid only earns its
+  // keep when the left column has real content beyond the header — a bio,
+  // premium gallery photos, or an owner viewing their own page (which
+  // always renders an editing section below). Without any of those, the
+  // left column is just the header sitting next to a much taller Contact
+  // sidebar — collapse to one column instead so nothing looks lopsided.
+  const hasLeftColumnContent =
+    Boolean(bio) || (isPremium && gallery.length > 0) || isOwner;
 
   // Render-time scheme allowlist: owners can update their own row via
   // PostgREST (RLS), bypassing the signup schema's protocol check — so the
@@ -186,27 +210,19 @@ export async function FirmDetail({
         </p>
       )}
       {firm.owner_id === null && (
-        <div className="mt-6 flex items-center justify-between gap-4">
+        <div className="mt-6 flex items-center justify-end gap-2">
           <Link
             href={`/${citySlug}/firms/${firmSlug}/claim`}
-            className="text-xs text-muted-foreground hover:text-foreground hover:underline"
+            className={cn(buttonVariants({ variant: "outline-navy", size: "sm" }))}
           >
-            Claim
+            Claim This Listing
           </Link>
-          <div className="flex items-center gap-2">
-            <Link
-              href={`/${citySlug}/firms/${firmSlug}/claim`}
-              className={buttonVariants({ variant: "outline", size: "sm" })}
-            >
-              Claim This Listing
-            </Link>
-            <PremiumUpgradeModal
-              firmId={firm.id}
-              claimHref={`/${citySlug}/firms/${firmSlug}/claim?premium=true`}
-              triggerLabel="Go Premium →"
-              triggerSize="sm"
-            />
-          </div>
+          <PremiumUpgradeModal
+            firmId={firm.id}
+            claimHref={`/${citySlug}/firms/${firmSlug}/claim?premium=true`}
+            triggerLabel="Go Premium →"
+            triggerSize="sm"
+          />
         </div>
       )}
 
@@ -217,7 +233,13 @@ export async function FirmDetail({
         / <span className="text-foreground">{firm.name}</span>
       </nav>
 
-      <div className="mt-6 grid gap-10 lg:grid-cols-[1fr_320px]">
+      <div
+        className={
+          hasLeftColumnContent
+            ? "mt-6 grid gap-10 lg:grid-cols-[1fr_320px]"
+            : "mt-6 grid gap-10 lg:mx-auto lg:max-w-md"
+        }
+      >
         <div>
           <div className="flex items-start gap-5">
             {isPremium && firm.logo_url && (
@@ -231,7 +253,7 @@ export async function FirmDetail({
             )}
             <div>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                <h1 className="text-3xl font-bold tracking-tight">
+                <h1 className="font-heading text-3xl font-semibold tracking-tight">
                   {firm.name}
                 </h1>
                 {isPremium && (
@@ -246,15 +268,14 @@ export async function FirmDetail({
                   </span>
                 )}
               </div>
-              {practiceAreas.length > 0 && (
-                <p className="mt-1 text-sm italic text-muted-foreground">
-                  {practiceAreas.map((a) => a.name).join(", ")}
-                </p>
-              )}
+              <p className="mt-1 text-lg font-medium text-muted-foreground">
+                {tagline}
+              </p>
               <div className="mt-1">
                 <GoogleRatingBadge
                   rating={firm.google_rating}
                   reviewCount={firm.google_review_count}
+                  googlePlaceId={firm.google_place_id}
                 />
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
