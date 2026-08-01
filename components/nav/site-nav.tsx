@@ -2,6 +2,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { CitySelector, type CitySelectorCity } from "./city-selector";
+import { AccountMenu } from "./account-menu";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 // Sitewide header. Server Component: reads the cities table directly so the
 // selector always reflects the DB (Phoenix live, others coming_soon).
@@ -20,7 +23,13 @@ async function getCities(): Promise<CitySelectorCity[]> {
 }
 
 export async function SiteNav() {
-  const cities = await getCities();
+  const [cities, supabase] = await Promise.all([
+    getCities(),
+    createClient(),
+  ]);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return (
     <header className="border-b border-border bg-white">
@@ -39,15 +48,22 @@ export async function SiteNav() {
         </Link>
         <nav className="flex items-center gap-2 sm:gap-4">
           <CitySelector cities={cities} />
-          <Link
-            href="/sign-in"
-            className="hidden rounded-lg px-4 py-2.5 text-base font-medium text-navy transition-colors hover:bg-muted sm:inline-block"
-          >
-            Login / Register
-          </Link>
+          {user ? (
+            <AccountMenu email={user.email ?? "Account"} />
+          ) : (
+            <Link
+              href="/sign-in"
+              className="hidden rounded-lg px-4 py-2.5 text-base font-medium text-navy transition-colors hover:bg-muted sm:inline-block"
+            >
+              Login / Register
+            </Link>
+          )}
           <Link
             href="/list-your-firm"
-            className="inline-flex h-11 items-center rounded-lg border-2 border-navy px-5 text-base font-semibold text-navy transition-colors hover:bg-navy hover:text-white"
+            className={cn(
+              buttonVariants({ variant: "outline-navy" }),
+              "h-11 px-5 text-base font-semibold",
+            )}
           >
             List Your Firm
           </Link>
