@@ -80,8 +80,15 @@ function getSnapshot(): State {
   return state;
 }
 
+// useSyncExternalStore requires this to return a STABLE reference across
+// calls when nothing has changed -- a fresh object/Set literal here (as
+// this originally returned) reads as "always different" and triggers
+// React's "should be cached to avoid an infinite loop" warning. This value
+// never changes (it's the fixed neutral pre-hydration state), so a single
+// module-level constant is the cache.
+const SERVER_SNAPSHOT: State = { ids: new Set(), signedIn: null, loaded: false };
 function getServerSnapshot(): State {
-  return { ids: new Set(), signedIn: null, loaded: false };
+  return SERVER_SNAPSHOT;
 }
 
 async function toggle(firmId: string) {
