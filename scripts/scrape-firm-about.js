@@ -7,18 +7,33 @@
  * its 8 "found" results had a real quality problem: mid-sentence
  * truncation, or prose describing an entirely different brand name).
  *
- * Approach: fetch the homepage, look for a link to an About-ish page
- * (href/text containing "about"), fetch that page if found (falls back to
- * the homepage itself for small sites with no separate About page), then
- * pull the first few real <p> paragraphs from its main content area --
- * paragraphs, not the whole flattened page text, so staff bios/testimonials
- * further down the page don't bleed into the summary.
+ * Approach: load the homepage in a real (headless) browser via Playwright
+ * -- not a plain fetch() -- so client-side-rendered sites actually resolve
+ * to real content instead of an empty shell (confirmed failure mode for
+ * az-hometown-law-firm/dentons on the fetch()-based first pass). Look for a
+ * link to an About-ish page (href/text containing "about"), load that page
+ * if found (falls back to the homepage itself for small sites with no
+ * separate About page), then pull the first few real <p> paragraphs from
+ * its main content area -- paragraphs, not the whole flattened page text,
+ * so staff bios/testimonials further down the page don't bleed into the
+ * summary.
+ *
+ * Headless browser rendering fixes JS-rendering failures, but is NOT a fix
+ * for the HTTP 403/429 failures also seen in the first pass -- those are
+ * anti-bot/WAF fingerprinting (Cloudflare etc.) triggering on automation
+ * signatures, unrelated to whether the page content itself is public. This
+ * script overrides the default headless UA and patches navigator.webdriver
+ * (basic, well-known evasion) but makes no attempt at real stealth/proxy
+ * rotation -- expect most 403/429s to still need manual outreach.
  *
  * Flags (for human review, not auto-rejected) when none of the firm's own
  * distinctive name words appear anywhere in the extracted text -- the same
  * smell test as match-google-places.js's looksLikeSameBusiness, adapted for
  * prose instead of a single business-name field. This is exactly what would
- * have caught the Sweet James / Clark Hill rebrand mismatches automatically.
+ * have caught the Sweet James / Clark Hill rebrand mismatches automatically
+ * -- though review still matters: it missed steve-mehr-injury-and-accident-
+ * attorneys on the first pass because generic words ("accident", "and")
+ * coincidentally overlapped with the firm name.
  *
  * Two-phase, same convention as fetch-firm-bios.js / match-google-places.js:
  *
@@ -40,14 +55,17 @@ const fs = require("fs");
 const path = require("path");
 const { createClient } = require("@supabase/supabase-js");
 const { parse } = require("node-html-parser");
+const { chromium } = require("playwright");
 
 const REPORT_PATH = path.join(__dirname, "about-scrape-report.json");
-const REQUEST_TIMEOUT_MS = 10000;
+const NAV_TIMEOUT_MS = 20000;
 const MIN_PARAGRAPH_LENGTH = 30;
 const BIO_SHORT_MAX = 280;
 const BIO_LONG_MAX = 1200;
-// Real browser UA -- several firm sites 403 the default Node fetch UA
-// (confirmed in fetch-firm-bios.js's run) but allow a normal browser UA.
+// Overrides Playwright Chromium's default headless UA, which otherwise
+// includes "HeadlessChrome" -- a bot-detection signal on its own, on top of
+// several firm sites already 403ing the plain Node fetch UA (confirmed in
+// fetch-firm-bios.js's run).
 const USER_AGENT =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 const NOISE_TAGS = ["script", "style", "noscript", "nav", "header", "footer", "svg", "form", "iframe"];
@@ -69,20 +87,21 @@ function parseArgs(argv) {
   return { apply, skip, includeFlagged };
 }
 
-async function fetchHtml(url) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-  try {
-    const res = await fetch(url, {
-      signal: controller.signal,
-      redirect: "follow",
-      headers: { "User-Agent": USER_AGENT },
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.text();
-  } finally {
-    clearTimeout(timeout);
-  }
+// domcontentloaded (not networkidle) -- several sites keep persistent
+// background requests alive (chat widgets, analytics beacons) that would
+// make networkidle hang or time out unnecessarily. The extra fixed wait
+// gives client-side rendering time to finish painting real content after
+// the initial DOM is ready, without waiting on network activity that may
+// never fully settle.
+async function fetchHtml(page, url) {
+  const response = await page.goto(url, {
+    waitUntil: "domcontentloaded",
+    timeout: NAV_TIMEOUT_MS,
+  });
+  if (!response) throw new Error("no response");
+  if (!response.ok()) throw new Error(`HTTP ${response.status()}`);
+  await page.waitForTimeout(1500);
+  return page.content();
 }
 
 // Same generic entity decoding as fetch-firm-bios.js -- real-world CMS
@@ -245,66 +264,86 @@ async function main() {
 
   console.log(`${firms.length} bio-less firms with a website. Scraping...\n`);
 
+  const browser = await chromium.launch();
+  const context = await browser.newContext({
+    userAgent: USER_AGENT,
+    viewport: { width: 1280, height: 900 },
+  });
+  // Basic, well-known evasion -- patches the one property (navigator.webdriver)
+  // that's true by default in every automated browser and checked by even
+  // unsophisticated bot detection. Not real stealth; determined WAFs (the
+  // 403/429s from the first pass) fingerprint on more than this one flag.
+  await context.addInitScript(() => {
+    Object.defineProperty(navigator, "webdriver", { get: () => undefined });
+  });
+
   const report = [];
-  for (const firm of firms) {
-    const prefix = `[${firm.slug}] ${firm.name}`;
-    let baseUrl;
-    try {
-      baseUrl = new URL(firm.website).href;
-    } catch {
-      console.log(`${prefix}: invalid website URL`);
-      report.push({ slug: firm.slug, name: firm.name, found: false, reason: "invalid website URL" });
-      continue;
-    }
-
-    try {
-      const homeHtml = await fetchHtml(baseUrl);
-      const homeRoot = parse(homeHtml, { lowerCaseTagName: true });
-      const aboutUrl = findAboutLink(homeRoot, baseUrl);
-
-      let sourceUrl = baseUrl;
-      let root = homeRoot;
-      if (aboutUrl && aboutUrl !== baseUrl) {
-        try {
-          const aboutHtml = await fetchHtml(aboutUrl);
-          root = parse(aboutHtml, { lowerCaseTagName: true });
-          sourceUrl = aboutUrl;
-        } catch {
-          // About page fetch failed -- fall back to homepage content
-          // already fetched above rather than failing the firm entirely.
-        }
-      }
-
-      const paragraphs = extractParagraphs(root);
-      if (paragraphs.length === 0) {
-        console.log(`${prefix}: no usable paragraph text — needs manual outreach`);
-        report.push({ slug: firm.slug, name: firm.name, found: false, reason: "no usable paragraph text" });
+  try {
+    for (const firm of firms) {
+      const prefix = `[${firm.slug}] ${firm.name}`;
+      let baseUrl;
+      try {
+        baseUrl = new URL(firm.website).href;
+      } catch {
+        console.log(`${prefix}: invalid website URL`);
+        report.push({ slug: firm.slug, name: firm.name, found: false, reason: "invalid website URL" });
         continue;
       }
 
-      const { bioShort, bioLong } = buildBios(paragraphs);
-      const flagged = !nameAppearsInText(firm.name, bioLong);
-      console.log(
-        `${prefix}${flagged ? "  ⚠ FLAGGED (name not found in text)" : ""}\n` +
-          `    source: ${sourceUrl}\n` +
-          `    "${bioShort}"`,
-      );
-      report.push({
-        slug: firm.slug,
-        name: firm.name,
-        found: true,
-        flagged,
-        source_url: sourceUrl,
-        bio_short: bioShort,
-        bio_long: bioLong,
-      });
-    } catch (err) {
-      const reason = err instanceof Error ? err.message : String(err);
-      console.log(`${prefix}: error — ${reason}`);
-      report.push({ slug: firm.slug, name: firm.name, found: false, reason });
-    }
+      const page = await context.newPage();
+      try {
+        const homeHtml = await fetchHtml(page, baseUrl);
+        const homeRoot = parse(homeHtml, { lowerCaseTagName: true });
+        const aboutUrl = findAboutLink(homeRoot, baseUrl);
 
-    await new Promise((resolve) => setTimeout(resolve, 300));
+        let sourceUrl = baseUrl;
+        let root = homeRoot;
+        if (aboutUrl && aboutUrl !== baseUrl) {
+          try {
+            const aboutHtml = await fetchHtml(page, aboutUrl);
+            root = parse(aboutHtml, { lowerCaseTagName: true });
+            sourceUrl = aboutUrl;
+          } catch {
+            // About page load failed -- fall back to homepage content
+            // already loaded above rather than failing the firm entirely.
+          }
+        }
+
+        const paragraphs = extractParagraphs(root);
+        if (paragraphs.length === 0) {
+          console.log(`${prefix}: no usable paragraph text — needs manual outreach`);
+          report.push({ slug: firm.slug, name: firm.name, found: false, reason: "no usable paragraph text" });
+          continue;
+        }
+
+        const { bioShort, bioLong } = buildBios(paragraphs);
+        const flagged = !nameAppearsInText(firm.name, bioLong);
+        console.log(
+          `${prefix}${flagged ? "  ⚠ FLAGGED (name not found in text)" : ""}\n` +
+            `    source: ${sourceUrl}\n` +
+            `    "${bioShort}"`,
+        );
+        report.push({
+          slug: firm.slug,
+          name: firm.name,
+          found: true,
+          flagged,
+          source_url: sourceUrl,
+          bio_short: bioShort,
+          bio_long: bioLong,
+        });
+      } catch (err) {
+        const reason = err instanceof Error ? err.message : String(err);
+        console.log(`${prefix}: error — ${reason}`);
+        report.push({ slug: firm.slug, name: firm.name, found: false, reason });
+      } finally {
+        await page.close();
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 300));
+    }
+  } finally {
+    await browser.close();
   }
 
   fs.writeFileSync(REPORT_PATH, JSON.stringify(report, null, 2));
