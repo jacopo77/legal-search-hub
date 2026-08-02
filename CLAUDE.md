@@ -113,25 +113,30 @@ data (a `cities` row), never via a new template or a parallel codebase.
   wrong once real product feedback comes in, update that section rather
   than silently diverging from it in code.
 
-## CLAIM / PREMIUM listing badges (built)
+## PREMIUM listing badge (built); CLAIM badge removed 2026-08-02
 
-Full design spec: `docs/DESIGN-BADGES.md`. Superseded the earlier draft of
-this note (which had the colors/shapes backwards — kept here only as
-history, see git blame if needed).
+Full design spec + history: `docs/DESIGN-BADGES.md`. That doc's earlier
+draft (which had the colors/shapes backwards) and the original CLAIM
+badge implementation are both kept here only as history — see git blame.
 
-- **CLAIM badge** (top-left of card image): red background `#E53935`,
-  white lettering, white border, chamfered corners. Shows when
-  `firms.owner_id IS NULL AND NOT claim_badge_hidden`. No click behavior
-  in v1 — visual status only.
 - **PREMIUM badge** (top-right of card image): navy background `#1E3A5F`,
-  gold lettering `#FBBF24`, same border/chamfer. Shows when
+  gold lettering `#FBBF24`, chamfered corners, white border. Shows when
   `firms.premium_badge = true`. Replaced the old amber "Featured" pill.
-- Both badges derive from existing/added columns rather than duplicating
-  state: CLAIM from `owner_id`, PREMIUM from the dedicated
-  `firms.premium_badge` flag (kept in sync by the Stripe webhook, with the
-  admin toggle as an override — not the same thing as `firms.tier`).
-- `firms.claim_badge_hidden` and `firms.premium_badge` (migration 0006) are
-  privileged columns — admin/service-role only, same as `status`/`tier`.
-- `/admin` has an "All listings" table (live/suspended firms) with three
-  toggles per row: listing on/off (`status`), CLAIM badge, PREMIUM badge —
-  same POST-form pattern as the T16 moderation queue, no client JS.
+  Derives from the dedicated `firms.premium_badge` flag (kept in sync by
+  the Stripe webhook, with the admin toggle as an override — not the same
+  thing as `firms.tier`).
+- `firms.premium_badge` (migration 0006) is a privileged column —
+  admin/service-role only, same as `status`/`tier`.
+- `/admin` has an "All listings" table (live/suspended firms) with two
+  toggles per row: listing on/off (`status`), PREMIUM badge — same
+  POST-form pattern as the T16 moderation queue, no client JS.
+- **No CLAIM badge on cards.** It used to show a red "CLAIM" badge
+  (top-left of card image) on every unclaimed firm — removed because full
+  grid coverage made the directory read as unused rather than prompting
+  claims, and red read as a warning rather than a positive CTA. In its
+  place, the firm detail page (`components/firms/firm-detail.tsx`) shows
+  an inline "Is this your business? Claim it" prompt under the bio,
+  gated on `firms.owner_id IS NULL` — same derivation as the old badge, so
+  it disappears automatically once claimed. `firms.claim_badge_hidden`
+  (migration 0006) is unused now but was left in the DB rather than
+  migrated away.

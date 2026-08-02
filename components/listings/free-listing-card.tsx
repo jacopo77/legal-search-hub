@@ -24,14 +24,12 @@ export function FreeListingCard({
   citySlug: string;
 }) {
   const primaryArea = firm.practiceAreas[0];
-  const showClaimBadge = firm.ownerId === null && !firm.claimBadgeHidden;
   const showPremiumBadge = firm.premiumBadge;
   const firmPath = `/${citySlug}/firms/${firm.slug}`;
 
   return (
     <li className="flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-shadow hover:shadow-sm">
       <div className="relative aspect-[4/3] w-full bg-gray-100">
-        {showClaimBadge && <StatusBadge variant="claim" />}
         {showPremiumBadge && <StatusBadge variant="premium" />}
         <SaveButton firmId={firm.id} className="absolute bottom-2 right-2 z-10" />
         {firm.logoUrl ? (

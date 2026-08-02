@@ -39,7 +39,6 @@ type ListingRow = {
   name: string;
   status: "live" | "suspended";
   owner_id: string | null;
-  claim_badge_hidden: boolean;
   premium_badge: boolean;
   cities: { name: string } | null;
 };
@@ -78,7 +77,7 @@ export async function ModerationQueue() {
     supabase
       .from("firms")
       .select(
-        "id, name, status, owner_id, claim_badge_hidden, premium_badge, cities(name)",
+        "id, name, status, owner_id, premium_badge, cities(name)",
       )
       .in("status", ["live", "suspended"])
       .order("name"),
@@ -245,7 +244,6 @@ export async function ModerationQueue() {
                   <th className="px-4 py-2 font-medium">City</th>
                   <th className="px-4 py-2 font-medium">Claimed</th>
                   <th className="px-4 py-2 font-medium">Listing</th>
-                  <th className="px-4 py-2 font-medium">CLAIM badge</th>
                   <th className="px-4 py-2 font-medium">PREMIUM badge</th>
                 </tr>
               </thead>
@@ -281,27 +279,6 @@ export async function ModerationQueue() {
                             {listing.status === "live" ? "On" : "Off"}
                           </Button>
                         </form>
-                      </td>
-                      <td className="px-4 py-2">
-                        {claimed ? (
-                          <span className="text-muted-foreground text-xs">
-                            — (claimed)
-                          </span>
-                        ) : (
-                          <form
-                            action={`/api/admin/firms/${listing.id}`}
-                            method="POST"
-                          >
-                            <input
-                              type="hidden"
-                              name="intent"
-                              value="toggle-claim-badge"
-                            />
-                            <Button type="submit" size="sm" variant="outline">
-                              {listing.claim_badge_hidden ? "Hidden" : "Showing"}
-                            </Button>
-                          </form>
-                        )}
                       </td>
                       <td className="px-4 py-2">
                         <form

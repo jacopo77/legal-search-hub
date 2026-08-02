@@ -303,6 +303,20 @@ export async function FirmDetail({
             </section>
           )}
 
+          {/* Claim nudge: only for unclaimed listings, so it disappears the
+              moment owner_id is set — no separate flag to keep in sync. */}
+          {firm.owner_id === null && (
+            <p className="mt-6 text-sm text-muted-foreground">
+              Is this your business?{" "}
+              <Link
+                href={`/${citySlug}/firms/${firmSlug}/claim`}
+                className="font-medium text-primary hover:underline"
+              >
+                Claim this listing
+              </Link>
+            </p>
+          )}
+
           {firm.bar_number && (
             <p className="mt-4 flex items-center gap-1.5 text-sm text-muted-foreground">
               <BadgeCheck className="size-4" aria-hidden />

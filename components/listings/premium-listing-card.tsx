@@ -19,13 +19,11 @@ export function PremiumListingCard({
   citySlug: string;
 }) {
   const primaryArea = firm.practiceAreas[0];
-  const showClaimBadge = firm.ownerId === null && !firm.claimBadgeHidden;
   const showPremiumBadge = firm.premiumBadge;
 
   return (
     <li className="relative flex flex-col rounded-xl border border-border bg-card p-8 shadow-sm">
       <div className="relative flex h-32 w-full items-center justify-center rounded-lg bg-gray-100">
-        {showClaimBadge && <StatusBadge variant="claim" />}
         {showPremiumBadge && <StatusBadge variant="premium" />}
         <SaveButton firmId={firm.id} className="absolute bottom-2 right-2 z-10" />
         {firm.logoUrl ? (

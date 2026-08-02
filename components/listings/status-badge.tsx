@@ -18,13 +18,6 @@ function chamferPolygon(cut: number): string {
 }
 
 const VARIANTS = {
-  claim: {
-    label: "CLAIM",
-    background: "#E53935",
-    color: "#FFFFFF",
-    ariaLabel: "Unclaimed listing — claim available",
-    position: "left-2",
-  },
   premium: {
     label: "PREMIUM",
     background: "#1E3A5F",

@@ -65,29 +65,6 @@ export async function POST(
     redirect("/admin");
   }
 
-  if (intent === "toggle-claim-badge") {
-    const { data: firm } = await supabase
-      .from("firms")
-      .select("claim_badge_hidden")
-      .eq("id", id)
-      .maybeSingle();
-    if (!firm) {
-      return Response.json({ error: "Firm not found" }, { status: 404 });
-    }
-    const { error } = await supabase
-      .from("firms")
-      .update({ claim_badge_hidden: !firm.claim_badge_hidden })
-      .eq("id", id);
-    if (error) {
-      console.error("admin/firms: toggle-claim-badge failed", error);
-      return Response.json(
-        { error: "Could not update badge" },
-        { status: 500 },
-      );
-    }
-    redirect("/admin");
-  }
-
   if (intent === "toggle-premium-badge") {
     const { data: firm } = await supabase
       .from("firms")

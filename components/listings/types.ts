@@ -12,8 +12,6 @@ export type ListingFirm = {
   googleRating: number | null;
   googleReviewCount: number | null;
   googlePlaceId: string | null;
-  ownerId: string | null;
-  claimBadgeHidden: boolean;
   premiumBadge: boolean;
   practiceAreas: { slug: string; name: string }[];
 };
@@ -33,8 +31,6 @@ export type FirmRow = {
   google_rating: number | null;
   google_review_count: number | null;
   google_place_id: string | null;
-  owner_id: string | null;
-  claim_badge_hidden: boolean;
   premium_badge: boolean;
   firm_practice_areas: {
     practice_areas: { slug: string; name: string } | null;
@@ -68,8 +64,6 @@ export function mapFirmRow(row: FirmRow): ListingFirm {
     googleRating: row.google_rating,
     googleReviewCount: row.google_review_count,
     googlePlaceId: row.google_place_id,
-    ownerId: row.owner_id,
-    claimBadgeHidden: row.claim_badge_hidden,
     premiumBadge: row.premium_badge,
     practiceAreas: row.firm_practice_areas
       .map((link) => link.practice_areas)
