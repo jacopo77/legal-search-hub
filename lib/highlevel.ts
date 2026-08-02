@@ -93,9 +93,10 @@ export async function createOrUpdateContact(input: {
 }
 
 // Checkout-completed trigger: the core revenue event — moves the firm's
-// contact through the nurture pipeline. pipelineId/stageId come from the
-// HighLevel pipeline settings (set them as pipeline stages are defined;
-// until then HighLevel uses the default stage).
+// contact through the nurture pipeline. pipelineId/stageId are both
+// effectively required — HighLevel's API rejects opportunity creation
+// without a pipelineId (COMMON_PIPELINE_ID_UNDEFINED), so callers must pass
+// them (see env.highlevel.opportunityPipelineId()/opportunityPremiumStageId()).
 export async function createOpportunity(input: {
   contactId: string;
   name: string;
@@ -110,6 +111,9 @@ export async function createOpportunity(input: {
         locationId: env.highlevel.locationId(),
         contactId: input.contactId,
         name: input.name,
+        // HighLevel requires status on every opportunity — "open" is
+        // correct for one freshly created off a checkout-completed event.
+        status: "open",
         ...(input.pipelineId ? { pipelineId: input.pipelineId } : {}),
         ...(input.stageId ? { pipelineStageId: input.stageId } : {}),
       },
@@ -134,6 +138,11 @@ export async function createOpportunity(input: {
   }
 }
 
+// Follow-up window for a task with no caller-supplied due date — HighLevel
+// requires `dueDate` on every task (as of a 2026 API tightening), so this
+// admin-created follow-up gets a default rather than leaving it caller-only.
+const DEFAULT_TASK_DUE_DAYS = 3;
+
 // Claim/edit-request trigger: a tracked follow-up item for an admin on the
 // firm's HighLevel contact.
 export async function createTask(input: {
@@ -142,13 +151,19 @@ export async function createTask(input: {
   body?: string;
   dueDate?: string; // ISO 8601
 }): Promise<HighLevelResult<{ id: string }>> {
+  const dueDate =
+    input.dueDate ??
+    new Date(
+      Date.now() + DEFAULT_TASK_DUE_DAYS * 24 * 60 * 60 * 1000,
+    ).toISOString();
   const result = await request<{ task: { id: string } }>(
     "POST",
     `/contacts/${encodeURIComponent(input.contactId)}/tasks`,
     {
       title: input.title,
       ...(input.body ? { body: input.body } : {}),
-      ...(input.dueDate ? { dueDate: input.dueDate } : {}),
+      dueDate,
+      completed: false,
     },
   );
   if (!result.ok) return result;

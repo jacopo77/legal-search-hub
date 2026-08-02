@@ -159,6 +159,8 @@ export async function POST(request: Request) {
             const opportunity = await createOpportunity({
               contactId: contact.data.id,
               name: `Premium upgrade: ${firm.name}`,
+              pipelineId: env.highlevel.opportunityPipelineId(),
+              stageId: env.highlevel.opportunityPremiumStageId(),
             });
             if (!opportunity.ok) {
               console.error(

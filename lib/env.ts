@@ -69,6 +69,15 @@ export const env = {
     // pair above (those are for the authenticated contacts/opportunities
     // REST API).
     webhookUrl: () => required("HIGHLEVEL_WEBHOOK_URL"),
+    // The "Legal Search Hub" pipeline in HighLevel — despite
+    // lib/highlevel.ts's createOpportunity() treating pipelineId as
+    // optional, HighLevel's API rejects opportunity creation without one
+    // (COMMON_PIPELINE_ID_UNDEFINED), so the checkout-completed trigger
+    // needs this to actually work rather than fail every time.
+    opportunityPipelineId: () => required("HIGHLEVEL_PIPELINE_ID"),
+    // "Converted - Premium" stage in that pipeline — the checkout-completed
+    // trigger creates its opportunity directly in this stage.
+    opportunityPremiumStageId: () => required("HIGHLEVEL_PREMIUM_STAGE_ID"),
   },
   googlePlaces: {
     apiKey: () => required("GOOGLE_PLACES_API_KEY"),
