@@ -10,6 +10,7 @@ import { FirmMap } from "@/components/firms/firm-map";
 import { LogoUploadForm } from "@/components/firms/logo-upload-form";
 import { BioEditForm } from "@/components/firms/bio-edit-form";
 import { PremiumUpgradeModal } from "@/components/firms/premium-upgrade-modal";
+import { SaveButton } from "@/components/saved/save-button";
 import { buttonVariants } from "@/components/ui/button";
 import { ShimmerImage } from "@/components/ui/shimmer-image";
 import { cn } from "@/lib/utils";
@@ -271,12 +272,13 @@ export async function FirmDetail({
               <p className="mt-1 text-lg font-medium text-muted-foreground">
                 {tagline}
               </p>
-              <div className="mt-1">
+              <div className="mt-2 flex items-center gap-2">
                 <GoogleRatingBadge
                   rating={firm.google_rating}
                   reviewCount={firm.google_review_count}
                   googlePlaceId={firm.google_place_id}
                 />
+                <SaveButton firmId={firm.id} variant="labeled" />
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
                 {practiceAreas.map((area) => (

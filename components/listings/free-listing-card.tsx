@@ -4,6 +4,7 @@ import { FirmLogoPlaceholder } from "./firm-logo-placeholder";
 import { StatusBadge } from "./status-badge";
 import { GoogleRatingBadge } from "./google-rating-badge";
 import { ShimmerImage } from "@/components/ui/shimmer-image";
+import { SaveButton } from "@/components/saved/save-button";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -32,6 +33,7 @@ export function FreeListingCard({
       <div className="relative aspect-[4/3] w-full bg-gray-100">
         {showClaimBadge && <StatusBadge variant="claim" />}
         {showPremiumBadge && <StatusBadge variant="premium" />}
+        <SaveButton firmId={firm.id} className="absolute bottom-2 right-2 z-10" />
         {firm.logoUrl ? (
           <ShimmerImage
             src={firm.logoUrl}

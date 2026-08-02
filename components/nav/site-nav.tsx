@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { Heart } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { CitySelector, type CitySelectorCity } from "./city-selector";
 import { AccountMenu } from "./account-menu";
@@ -48,6 +49,13 @@ export async function SiteNav() {
         </Link>
         <nav className="flex items-center gap-2 sm:gap-4">
           <CitySelector cities={cities} />
+          <Link
+            href="/saved"
+            className="hidden items-center gap-1.5 rounded-lg px-3 py-2.5 text-base font-medium text-navy transition-colors hover:bg-muted sm:inline-flex"
+          >
+            <Heart className="size-4" aria-hidden />
+            Saved
+          </Link>
           {user ? (
             <AccountMenu email={user.email ?? "Account"} />
           ) : (

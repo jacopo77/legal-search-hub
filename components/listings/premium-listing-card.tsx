@@ -4,6 +4,7 @@ import { StatusBadge } from "./status-badge";
 import { FirmLogoPlaceholder } from "./firm-logo-placeholder";
 import { GoogleRatingBadge } from "./google-rating-badge";
 import { ShimmerImage } from "@/components/ui/shimmer-image";
+import { SaveButton } from "@/components/saved/save-button";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +27,7 @@ export function PremiumListingCard({
       <div className="relative flex h-32 w-full items-center justify-center rounded-lg bg-gray-100">
         {showClaimBadge && <StatusBadge variant="claim" />}
         {showPremiumBadge && <StatusBadge variant="premium" />}
+        <SaveButton firmId={firm.id} className="absolute bottom-2 right-2 z-10" />
         {firm.logoUrl ? (
           <div className="relative h-28 w-full">
             <ShimmerImage
