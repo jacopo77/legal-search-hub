@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { FreeListingCard } from "@/components/listings/free-listing-card";
 import { SortMenu, type SortOption } from "@/components/listings/sort-menu";
+import { getFallbackPracticeArea } from "@/lib/practice-area-fallback";
 import {
   mapFirmRow,
   partitionByImage,
@@ -128,6 +129,24 @@ export default async function AllFirmsPage({
     getPracticeAreas(),
   ]);
 
+  // Adjacent-category fallback (UX review Feature Gap #6): a selected chip
+  // with zero firms is otherwise a dead end. Only ever looked up once the
+  // real query above has already come back empty.
+  const activeAreaName = practiceArea
+    ? (practiceAreas.find((a) => a.slug === practiceArea)?.name ?? practiceArea)
+    : null;
+
+  let fallbackFirms: Awaited<ReturnType<typeof getFreeFirms>> = [];
+  let fallbackAreaName: string | null = null;
+  if (practiceArea && firms.length === 0) {
+    const fallbackSlug = getFallbackPracticeArea(practiceArea);
+    if (fallbackSlug) {
+      const fallbackArea = practiceAreas.find((a) => a.slug === fallbackSlug);
+      fallbackAreaName = fallbackArea?.name ?? fallbackSlug;
+      fallbackFirms = await getFreeFirms(cityRow.id, fallbackSlug, sort);
+    }
+  }
+
   function buildHref({
     practiceArea: nextArea,
     sort: nextSort,
@@ -208,15 +227,38 @@ export default async function AllFirmsPage({
       </div>
 
       {firms.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-border p-6 text-sm text-muted-foreground">
-          {practiceArea
-            ? "No firms match this practice area yet. Try another filter, or "
-            : "No firms are listed yet. "}
-          <Link href="/list-your-firm" className="text-primary hover:underline">
-            List your firm
-          </Link>{" "}
-          to be the first.
-        </p>
+        <>
+          <p className="rounded-xl border border-dashed border-border p-6 text-sm text-muted-foreground">
+            {practiceArea
+              ? "No firms match this practice area yet. Try another filter, or "
+              : "No firms are listed yet. "}
+            <Link
+              href="/list-your-firm"
+              className="text-primary hover:underline"
+            >
+              List your firm
+            </Link>{" "}
+            to be the first.
+          </p>
+
+          {fallbackFirms.length > 0 && (
+            <div className="mt-8">
+              <h2 className="text-sm font-semibold text-muted-foreground">
+                No {activeAreaName} firms yet — here are {fallbackAreaName}{" "}
+                firms who handle {activeAreaName?.toLowerCase()} cases
+              </h2>
+              <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {fallbackFirms.map((firm) => (
+                  <FreeListingCard
+                    key={firm.id}
+                    firm={firm}
+                    citySlug={cityRow.slug}
+                  />
+                ))}
+              </ul>
+            </div>
+          )}
+        </>
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {firms.map((firm) => (

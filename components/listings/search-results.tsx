@@ -2,8 +2,10 @@ import Link from "next/link";
 import { SearchX } from "lucide-react";
 import { searchFirms, firmsByPracticeArea } from "@/lib/search";
 import { createClient } from "@/lib/supabase/server";
+import { getFallbackPracticeArea } from "@/lib/practice-area-fallback";
 import { PremiumListingCard } from "./premium-listing-card";
 import { FreeListingCard } from "./free-listing-card";
+import type { ListingFirm } from "./types";
 
 // Results view for the Hero search (?q=) and practice-area chips
 // (?practiceArea=). Replaces the tiered sections on the city page whenever
@@ -39,6 +41,29 @@ export async function SearchResults({
     practiceAreaName = data?.name ?? practiceAreaSlug;
   }
 
+  // Adjacent-category fallback (UX review Feature Gap #6): a bare category
+  // chip with zero results is a dead end otherwise. Only applies with no
+  // text query -- a query implies the user is matching a specific name, and
+  // surfacing an unrelated category's results wouldn't answer that.
+  let fallbackFirms: ListingFirm[] = [];
+  let fallbackAreaName: string | null = null;
+  if (!query && practiceAreaSlug && firms.length === 0) {
+    const fallbackSlug = getFallbackPracticeArea(practiceAreaSlug);
+    if (fallbackSlug) {
+      const supabase = await createClient();
+      const [{ data: fallbackArea }, results] = await Promise.all([
+        supabase
+          .from("practice_areas")
+          .select("name")
+          .eq("slug", fallbackSlug)
+          .maybeSingle(),
+        firmsByPracticeArea(cityId, fallbackSlug),
+      ]);
+      fallbackAreaName = fallbackArea?.name ?? fallbackSlug;
+      fallbackFirms = results;
+    }
+  }
+
   const count = firms.length;
   const heading = query
     ? practiceAreaName
@@ -61,27 +86,55 @@ export async function SearchResults({
       </div>
 
       {firms.length === 0 ? (
-        <div className="mt-4 flex flex-col items-center gap-3 rounded-xl border border-dashed border-border p-10 text-center">
-          <SearchX className="size-8 text-muted-foreground/60" aria-hidden />
-          <p className="text-sm text-muted-foreground">
-            {query ? (
-              <>
-                No firms match &ldquo;{query}&rdquo;
-                {practiceAreaName ? ` in ${practiceAreaName}` : ""} yet. Try a
-                different search, or{" "}
-              </>
-            ) : (
-              <>No {practiceAreaName} firms are listed yet. </>
-            )}
-            <Link
-              href={`/${citySlug}/firms`}
-              className="text-primary hover:underline"
-            >
-              browse all firms
-            </Link>
-            .
-          </p>
-        </div>
+        <>
+          <div className="mt-4 flex flex-col items-center gap-3 rounded-xl border border-dashed border-border p-10 text-center">
+            <SearchX className="size-8 text-muted-foreground/60" aria-hidden />
+            <p className="text-sm text-muted-foreground">
+              {query ? (
+                <>
+                  No firms match &ldquo;{query}&rdquo;
+                  {practiceAreaName ? ` in ${practiceAreaName}` : ""} yet. Try
+                  a different search, or{" "}
+                </>
+              ) : (
+                <>No {practiceAreaName} firms are listed yet. </>
+              )}
+              <Link
+                href={`/${citySlug}/firms`}
+                className="text-primary hover:underline"
+              >
+                browse all firms
+              </Link>
+              .
+            </p>
+          </div>
+
+          {fallbackFirms.length > 0 && (
+            <div className="mt-8">
+              <h3 className="text-sm font-semibold text-muted-foreground">
+                No {practiceAreaName} firms yet — here are {fallbackAreaName}{" "}
+                firms who handle {practiceAreaName?.toLowerCase()} cases
+              </h3>
+              <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {fallbackFirms.map((firm) =>
+                  firm.tier === "premium" ? (
+                    <PremiumListingCard
+                      key={firm.id}
+                      firm={firm}
+                      citySlug={citySlug}
+                    />
+                  ) : (
+                    <FreeListingCard
+                      key={firm.id}
+                      firm={firm}
+                      citySlug={citySlug}
+                    />
+                  ),
+                )}
+              </ul>
+            </div>
+          )}
+        </>
       ) : (
         <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {firms.map((firm) =>
