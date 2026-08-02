@@ -82,9 +82,11 @@ async function getFreeFirms(
   }
   const firms = (data as unknown as FirmRow[]).map(mapFirmRow);
 
-  // The image-first partition is a cosmetic default for the unsorted grid
-  // (fd3a871) — an explicit rating/review sort is a deliberate user choice
-  // and takes priority over it.
+  // The image-first partition (fd3a871) only applies to the alphabetical
+  // sort, which is otherwise a flat, visually monotonous list of mostly
+  // placeholder cards — rating/reviews sorts are a deliberate user choice
+  // and already carry their own meaningful order, so they take priority
+  // over this cosmetic grouping.
   return sort === "name" ? partitionByImage(firms) : firms;
 }
 
@@ -120,7 +122,7 @@ export default async function AllFirmsPage({
   if (!cityRow || cityRow.status !== "live") notFound();
 
   const citySlug = cityRow.slug;
-  const sort: SortOption = isSortOption(sortParam) ? sortParam : "name";
+  const sort: SortOption = isSortOption(sortParam) ? sortParam : "rating";
   const [firms, practiceAreas] = await Promise.all([
     getFreeFirms(cityRow.id, practiceArea, sort),
     getPracticeAreas(),
@@ -135,7 +137,7 @@ export default async function AllFirmsPage({
   }) {
     const params = new URLSearchParams();
     if (nextArea) params.set("practiceArea", nextArea);
-    if (nextSort && nextSort !== "name") params.set("sort", nextSort);
+    if (nextSort && nextSort !== "rating") params.set("sort", nextSort);
     const qs = params.toString();
     return `/${citySlug}/firms${qs ? `?${qs}` : ""}`;
   }
